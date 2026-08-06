@@ -1,0 +1,7 @@
+flowrate.db
+flowrate.db-shm
+flowrate.db-wal
+__pycache__/
+*.pyc
+.venv
+.idea/
