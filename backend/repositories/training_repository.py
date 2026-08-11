@@ -95,4 +95,35 @@ class TrainingRepository:
 
         self.connection.commit()
 
+    def get_all_trainings_with_tasks(self):
+        self.cursor.execute(
+            """SELECT * from trainings"""
+        )
+
+        trainings = self.cursor.fetchall()
+
+        self.cursor.execute(
+            """SELECT * from training_tasks"""
+        )
+
+        tasks = self.cursor.fetchall()
+
+        tasks_by_training_id = {}
+
+        for task in tasks:
+            if task["training_id"] in tasks_by_training_id:
+                tasks_by_training_id[task["training_id"]].append(task)
+            else:
+                tasks_by_training_id[task["training_id"]] = [task]
+
+        trainings_with_tasks = []
+
+        for training in trainings:
+            training = dict(training)
+            # Korzstamy z get w celu zabezpieczenia się przed KeyError
+            training["tasks"] = tasks_by_training_id.get(training["id"], [])
+            trainings_with_tasks.append(training)
+
+        return trainings_with_tasks
+
 training_repository = TrainingRepository(database.cursor, database.connection)

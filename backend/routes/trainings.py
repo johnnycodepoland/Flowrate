@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from backend.repositories.training_repository import training_repository
 from backend.models.training import Training
+from backend.services.training_load import calculate_percentage_fatigue
 
 router = APIRouter()
 
@@ -66,3 +67,11 @@ def update_training(training_id: int, training: Training):
     training_repository.update_training(training)
 
     return {"updated": training}
+
+@router.get("/fatigue")
+def get_percentage_fatigue():
+    trainings_with_tasks = training_repository.get_all_trainings_with_tasks()
+
+    percentage_fatigue = calculate_percentage_fatigue(trainings_with_tasks)
+
+    return {"percentage_fatigue": percentage_fatigue}
