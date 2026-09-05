@@ -18,7 +18,12 @@ const trainings = [
 export default function AllTrainings() {
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.pageTitle}>Wszystkie treningi</Text>
+            <View style={styles.allTrainingsSectionHeader}>
+                <Pressable onPress={() => router.back()}>
+                    <Ionicons name="chevron-back" size={32} color="#1A1A1A" />
+                </Pressable>
+                <Text style={styles.pageTitle}>Wszystkie treningi</Text>
+            </View>
             <View style={styles.activityCard}>
                 {trainings.map((training, index) => (
                     <Pressable key={index} style={styles.activityRow} onPress={() => router.push(`/training/${index}`)}>
@@ -87,5 +92,8 @@ const styles = StyleSheet.create({
         borderRadius:20,
         padding: 16,
         gap: 8,
-        marginTop: 16}
+        marginTop: 16},
+    allTrainingsSectionHeader: {
+        allignItems: "center",
+        flexDirection: "row"}
 })
