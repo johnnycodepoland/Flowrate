@@ -57,14 +57,14 @@ export default function Index() {
         </View>
         <View style={styles.activityCard}>
             {trainings.slice(0, 6).map((training, index) => (
-                <View key={index} style={styles.activityRow}>
-                     <View style={styles.iconBadge}>
+                <Pressable key={index} style={styles.activityRow} onPress={() => router.push(`/training/${index}`)}>
+                    <View style={styles.iconBadge}>
                         <MaterialCommunityIcons name="swim" size={28} color="#FFFFFF"/>
                         <Text style={styles.iconBadgeText}>{training.RPE}</Text>
                     </View>
                     <Text style={styles.activityTitle}>Pływanie</Text>
                     <Text style={styles.activityTime}>{training.time} min</Text>
-                </View>
+                </Pressable>
             ))}
         </View>
         <Pressable onPress={() => router.push("/all-trainings")}>
