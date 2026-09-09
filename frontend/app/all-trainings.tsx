@@ -1,21 +1,20 @@
 import {ScrollView, StyleSheet, Text, View, Pressable} from "react-native";
+import {useState, useEffect} from "react";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useRouter} from "expo-router";
 
-const trainings = [
-    {date: "10 sierpnia", distance: 2800, time: 90, RPE: 4.5},
-    {date: "9 sierpnia", distance: 4200, time: 90, RPE: 9.3},
-    {date: "11 sierpnia", distance: 2200, time: 90, RPE: 5.2},
-    {date: "12 sierpnia", distance: 1850, time: 90, RPE: 9.8},
-    {date: "15 sierpnia", distance: 1150, time: 90, RPE: 1.8},
-    {date: "20 sierpnia", distance: 3500, time: 60, RPE: 6.8},
-    {date: "1 września", distance: 2500, time: 90, RPE: 3.8},
-    ];
-    const router = useRouter();
-
 export default function AllTrainings() {
+    const router = useRouter();
+    const [trainings, setTrainings] = useState([]);
+
+    useEffect(() => {
+        fetch("http://192.168.68.60:8000/trainings")
+            .then(response => response.json())
+            .then(data => setTrainings(data));
+    }, []);
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.allTrainingsSectionHeader}>
@@ -26,7 +25,7 @@ export default function AllTrainings() {
             </View>
             <View style={styles.activityCard}>
                 {trainings.map((training, index) => (
-                    <Pressable key={index} style={styles.activityRow} onPress={() => router.push(`/training/${index}`)}>
+                    <Pressable key={index} style={styles.activityRow} onPress={() => router.push(`/training/${training.id}`)}>
                         <View style={styles.iconBadge}>
                             <MaterialCommunityIcons name="swim" size={28} color="#FFFFFF"/>
                             <Text style={styles.iconBadgeText}>{training.RPE}</Text>
@@ -94,6 +93,6 @@ const styles = StyleSheet.create({
         gap: 8,
         marginTop: 16},
     allTrainingsSectionHeader: {
-        allignItems: "center",
+        alignItems: "center",
         flexDirection: "row"}
 })

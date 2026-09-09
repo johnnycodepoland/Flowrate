@@ -3,7 +3,6 @@ import math
 
 from backend.models.training import Training
 
-
 def calculate_deviation(task_target_time, average_segment_time):
     # Obliczamy procentowe odychlenie od planowanego czasu
     deviation = (average_segment_time - task_target_time) / task_target_time
@@ -67,7 +66,7 @@ def calculate_percentage_fatigue(trainings_with_tasks):
     maximum_value = 6000
     fatigue_sum = calculate_fatigue_sum(trainings_with_tasks)
 
-    # Korzystamy w wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb któ^
+    # Korzystamy w wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb, aby uniknąć 100 procentowego obciążenia
     percentage_fatigue = min(100, (fatigue_sum / maximum_value) * 100)
 
     return percentage_fatigue
