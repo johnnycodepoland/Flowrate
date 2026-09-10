@@ -32,6 +32,8 @@ export default function TrainingDetails() {
         return null;
     }
 
+    const formattedDate = new Date(training.date).toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
+
     return (
         <ScrollView style={styles.container}>
              <View style={styles.trainingSectionHeader}>
@@ -40,7 +42,7 @@ export default function TrainingDetails() {
              </Pressable>
              <View style={styles.swimmingAndDateSection}>
                 <Text style={styles.pageTittle}>Pływanie</Text>
-                <Text style={styles.pageSubtitle}>{training.date}</Text>
+                <Text style={styles.pageSubtitle}>{formattedDate}</Text>
              </View>
              </View>
              <View style={styles.heroStat}>
