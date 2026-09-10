@@ -10,7 +10,7 @@ export default function AllTrainings() {
     const [trainings, setTrainings] = useState([]);
 
     useEffect(() => {
-        fetch("http://192.168.68.60:8000/trainings")
+        fetch("http://192.168.68.67:8000/trainings")
             .then(response => response.json())
             .then(data => setTrainings(data));
     }, []);

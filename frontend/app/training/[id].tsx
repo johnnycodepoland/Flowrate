@@ -1,30 +1,22 @@
 import {Pressable, StyleSheet, ScrollView, Text, View} from "react-native";
+import {useState, useEffect} from "react"
 import {useLocalSearchParams} from "expo-router";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {useRouter} from "expo-router";
 
-const trainings = [
-    {date: "10 sierpnia", distance: 2800, time: 90, RPE: 4.5},
-    {date: "9 sierpnia", distance: 4200, time: 90, RPE: 9.3},
-    {date: "11 sierpnia", distance: 2200, time: 90, RPE: 5.2},
-    {date: "12 sierpnia", distance: 1850, time: 90, RPE: 9.8},
-    {date: "15 sierpnia", distance: 1150, time: 90, RPE: 1.8},
-    {date: "20 sierpnia", distance: 3500, time: 60, RPE: 6.8},
-    {date: "1 września", distance: 2500, time: 90, RPE: 3.8},
-];
-
-const tasks = [
-    {description: "8x50m", task_distance: 400, task_reps: 8, task_target_time: 30, task_break: 30, average_segment_time: 31},
-    {description: "10x100m", task_distance: 1000, task_reps: 10, task_target_time: 70, task_break: 60, average_segment_time: 69},
-    {description: "Rozpływanie", task_distance: 200, task_reps: 1, task_target_time: 240, task_break: 0, average_segment_time: 240},
-    ];
-
 export default function TrainingDetails() {
     const {id} = useLocalSearchParams();
     const router = useRouter();
-    const training = trainings[Number(id)];
+    const [training, setTraining] = useState(null);
+
+    useEffect (() => {
+        fetch(`http://192.168.68.67:8000/trainings/${id}`)
+            .then(response => response.json())
+            .then(data => setTraining(data));
+    }, []);
+
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -33,6 +25,10 @@ export default function TrainingDetails() {
     });
 
     if (!fontLoaded) {
+        return null;
+    }
+
+    if (!training) {
         return null;
     }
 
@@ -69,7 +65,7 @@ export default function TrainingDetails() {
              </View>
              <Text style={styles.sectionTitle}>Zadania</Text>
              <View style={styles.tasksList}>
-                {tasks.map((task, index) => (
+                {training.tasks.map((task, index) => (
                     <View key={index} style={styles.taskCard}>
                         <Text style={styles.taskTitle}>{task.description}</Text>
                         <View style={styles.taskDetailsRow}>
