@@ -6,7 +6,7 @@ import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useRouter} from "expo-router";
 
 export default function Index() {
-
+    const today = new Date().toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -40,7 +40,7 @@ export default function Index() {
                 </View>
             </View>
             <View style={styles.dateBox}>
-                <Text style={styles.dateText}>10 sierpnia</Text>
+                <Text style={styles.dateText}>{today}</Text>
                 <View style={{flexDirection: "row", alignItems: "center", gap: 4}}>
                     <Ionicons name="sunny" size={16} color="#1A1A1A" />
                     <Text style={styles.weatherText}>26°C</Text>
