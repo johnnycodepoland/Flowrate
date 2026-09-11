@@ -12,7 +12,7 @@ export default function TrainingDetails() {
     const [training, setTraining] = useState(null);
 
     useEffect (() => {
-        fetch(`http://192.168.68.67:8000/trainings/${id}`)
+        fetch(`http://192.168.68.64:8000/trainings/${id}`)
             .then(response => response.json())
             .then(data => setTraining(data));
     }, []);
@@ -34,6 +34,13 @@ export default function TrainingDetails() {
 
     const formattedDate = new Date(training.date).toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
 
+    const handleDelete = () => {
+        fetch(`http://192.168.68.64:8000/trainings/${id}`, {
+            method: "DELETE"
+        })
+            .then(() => router.back());
+    };
+
     return (
         <ScrollView style={styles.container}>
              <View style={styles.trainingSectionHeader}>
@@ -44,6 +51,9 @@ export default function TrainingDetails() {
                 <Text style={styles.pageTittle}>Pływanie</Text>
                 <Text style={styles.pageSubtitle}>{formattedDate}</Text>
              </View>
+             <Pressable style={styles.menuButton} onPress={handleDelete}>
+                <Ionicons name="ellipsis-horizontal" size={24} color="#1A1A1A" />
+             </Pressable>
              </View>
              <View style={styles.heroStat}>
                 <Text style={styles.heroNumber}>{training.RPE}</Text>
@@ -185,5 +195,7 @@ const styles = StyleSheet.create({
     taskDetailText: {
         color: "#1A1A1A",
         fontSize: 18,
-        fontFamily: "Inter_400Regular"}
+        fontFamily: "Inter_400Regular"},
+    menuButton: {
+        marginLeft: "auto"}
 })

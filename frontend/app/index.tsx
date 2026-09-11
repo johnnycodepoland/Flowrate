@@ -1,9 +1,9 @@
 import {ScrollView, Text, View, StyleSheet, Image, Pressable} from "react-native";
-import {useState, useEffect} from "react";
+import {useState, useEffect, useCallback} from "react";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
-import {useRouter} from "expo-router";
+import {useRouter, useFocusEffect} from "expo-router";
 
 export default function Index() {
     const today = new Date().toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
@@ -16,11 +16,13 @@ export default function Index() {
     const router = useRouter();
     const [trainings, setTrainings] = useState([]);
 
-    useEffect(() => {
-        fetch("http://192.168.68.67:8000/trainings")
-            .then(response => response.json())
-            .then(data => setTrainings(data));
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            fetch("http://192.168.68.64:8000/trainings")
+                .then(response => response.json())
+                .then(data => setTrainings(data));
+        }, [])
+    );
 
     if (!fontLoaded) {
         return null;
