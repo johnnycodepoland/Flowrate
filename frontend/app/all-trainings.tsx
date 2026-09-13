@@ -6,16 +6,26 @@ import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useRouter, useFocusEffect} from "expo-router";
 
 export default function AllTrainings() {
+    const [fontLoaded] = useFonts({
+        Montserrat_700Bold,
+        Montserrat_400Regular,
+        Inter_700Bold,
+        Inter_400Regular,
+    });
     const router = useRouter();
     const [trainings, setTrainings] = useState([]);
 
     useFocusEffect(
         useCallback(() => {
-            fetch("http://192.168.68.64:8000/trainings")
+            fetch("http://172.20.10.2:8000/trainings")
                 .then(response => response.json())
                 .then(data => setTrainings(data));
         }, [])
     );
+
+    if (!fontLoaded) {
+        return null;
+    }
 
     return (
         <ScrollView style={styles.container}>
