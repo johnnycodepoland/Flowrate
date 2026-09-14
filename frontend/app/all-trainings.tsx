@@ -17,7 +17,7 @@ export default function AllTrainings() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch("http://172.20.10.2:8000/trainings")
+            fetch("http://192.168.68.59:8000/trainings")
                 .then(response => response.json())
                 .then(data => setTrainings(data));
         }, [])

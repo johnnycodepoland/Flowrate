@@ -18,7 +18,7 @@ export default function Index() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch("http://192.168.68.64:8000/trainings")
+            fetch("http://192.168.68.59:8000/trainings")
                 .then(response => response.json())
                 .then(data => setTrainings(data));
         }, [])
@@ -51,7 +51,7 @@ export default function Index() {
         </View>
         <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Ostatnie treningi</Text>
-            <Pressable style={styles.plusButton}>
+            <Pressable style={styles.plusButton} onPress={() => router.push("/add-training")}>
                 <Text style={styles.plusButtonText}>+</Text>
             </Pressable>
         </View>

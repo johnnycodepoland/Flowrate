@@ -12,7 +12,7 @@ export default function TrainingDetails() {
     const [training, setTraining] = useState(null);
 
     useEffect (() => {
-        fetch(`http://192.168.68.64:8000/trainings/${id}`)
+        fetch(`http://192.168.68.59:8000/trainings/${id}`)
             .then(response => response.json())
             .then(data => setTraining(data));
     }, []);
@@ -35,7 +35,7 @@ export default function TrainingDetails() {
     const formattedDate = new Date(training.date).toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
 
     const handleDelete = () => {
-        fetch(`http://192.168.68.64:8000/trainings/${id}`, {
+        fetch(`http://192.168.68.59:8000/trainings/${id}`, {
             method: "DELETE"
         })
             .then(() => router.back());
