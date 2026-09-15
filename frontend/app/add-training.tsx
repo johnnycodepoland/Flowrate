@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {View, Text, StyleSheet, Pressable} from "react-native";
+import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback} from "react-native";
 import {useRouter} from "expo-router";
 import {Ionicons} from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
@@ -14,53 +14,196 @@ export default function AddTraining() {
     const [date, setDate] = useState(new Date());
     const formattedDate = date.toLocaleDateString("pl-PL", {day: "numeric", month: "long", year: "numeric"});
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [taskDescription, setTaskDescription] = useState("");
+    const [taskDistance, setTaskDistance] = useState("");
+    const [taskReps, setTaskReps] = useState("");
+    const [taskTargetTime, setTaskTargetTime] = useState("");
+    const [taskBreak, setTaskBreak] = useState("");
+    const [averageSegmentTime, setAverageSegmentTime] = useState("");
+    const [tasks, setTasks] = useState([]);
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
         Inter_700Bold,
         Inter_400Regular,
     });
+    const handleBack = () => {
+        if (step ===1) {
+            router.back();
+         } else {
+             setStep(step - 1);
+         }
+    };
+
+    const handleAddTask = () => {
+        const newTask = {
+            description: taskDescription,
+            task_distance: Number(taskDistance),
+            task_reps: Number(taskReps),
+            task_target_time: Number(taskTargetTime),
+            task_break: Number(taskBreak),
+            average_segment_time: Number(averageSegmentTime),
+        };
+        const updatedTasks = [...tasks, newTask];
+        setTasks(updatedTasks);
+        setTaskDescription("");
+        setTaskDistance("");
+        setTaskReps("");
+        setTaskTargetTime("");
+        setTaskBreak("");
+        setAverageSegmentTime("");
+    };
+
+    const handleSave = () => {
+        let allTasks = tasks;
+
+        if (taskDescription.trim() !== "") {
+            const lastTask = {
+                description: taskDescription,
+                task_distance: Number(taskDistance),
+                task_reps: Number(taskReps),
+                task_target_time: Number(taskTargetTime),
+                task_break: Number(taskBreak),
+                average_segment_time: Number(averageSegmentTime),
+            };
+            allTasks = [...tasks, lastTask]
+        }
+
+
+        const totalDistance = allTasks.reduce((sum, task) => sum + task.task_distance * task.task_reps, 0);
+        const totalTime = allTasks.reduce((sum, task) => sum + (task.task_target_time + task.task_break) * task.task_reps, 0);
+
+        const newTraining = {
+            date: date.toISOString().split("T")[0],
+            time: Math.round(totalTime / 60),
+            distance: totalDistance,
+            RPE: rpe,
+            tasks: allTasks,
+        };
+
+        fetch("http://192.168.68.59:8000/trainings", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(newTraining),
+        })
+            .then(() => router.push("/"));
+    };
 
     if (!fontLoaded) {
         return null;
     }
 
     return (
-        <View style={styles.container}>
-            <View style={styles.addTrainingSectionHeader}>
-                <Pressable onPress={() => router.back()}>
-                    <Ionicons name="chevron-back" size={32} color="#1A1A1A" />
-                </Pressable>
-                <Text style={styles.pageTitle}>Dodaj trening</Text>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.container}>
+                <View style={styles.addTrainingSectionHeader}>
+                    <Pressable onPress={handleBack}>
+                        <Ionicons name="chevron-back" size={32} color="#1A1A1A" />
+                    </Pressable>
+                    <Text style={styles.pageTitle}>Dodaj trening</Text>
+                </View>
+
+                {step === 1 && (
+                    <>
+                        <Text style={styles.label}>RPE sesji: {rpe}</Text>
+                        <Slider
+                            style={{width: "100%", height: 40}}
+                            minimumValue={1}
+                            maximumValue={10}
+                            step={1}
+                            value={rpe}
+                            onValueChange={setRpe}
+                            minimumTrackTintColor="#6366F1"
+                            maximumTrackTintColor="#F5F5F7"
+                        />
+                        <Text style={styles.label}>Data treningu</Text>
+                        <Pressable style={styles.dateBox} onPress={() => setShowDatePicker(true)}>
+                            <Text style={styles.dateText}>{formattedDate}</Text>
+                        </Pressable>
+                        {showDatePicker && (
+                            <DateTimePicker
+                                value={date}
+                                mode="date"
+                                display="default"
+                                onValueChange={(event, selectedDate) => {
+                                    setShowDatePicker(false);
+                                    if (selectedDate) {
+                                        setDate(selectedDate);
+                                    }
+                                }}
+                            />
+                        )}
+                        <Pressable style={styles.nextButton} onPress={() => setStep(2)}>
+                            <Text style={styles.nextButtonText}>Dalej</Text>
+                        </Pressable>
+                    </>
+                )}
+
+                {step === 2 && (
+                    <>
+                        <Text style={styles.label}>Opis zadania</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="np. 8x50m"
+                            value={taskDescription}
+                            onChangeText={setTaskDescription}
+                        />
+
+                        <Text style={styles.label}>Dystans odcinka (m)</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="np. 1000"
+                            value={taskDistance}
+                            onChangeText={setTaskDistance}
+                            keyboardType="numeric"
+                        />
+
+                        <Text style={styles.label}>Liczba powtórzeń</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="np. 8"
+                            value={taskReps}
+                            onChangeText={setTaskReps}
+                            keyboardType="numeric"
+                        />
+
+                        <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="np. 30"
+                            value={taskTargetTime}
+                            onChangeText={setTaskTargetTime}
+                            keyboardType="numeric"
+                        />
+
+                        <Text style={styles.label}>Przerwa (s)</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="np. 20"
+                            value={taskBreak}
+                            onChangeText={setTaskBreak}
+                            keyboardType="numeric"
+                        />
+
+                        <Text style={styles.label}>Średni czas powórzenia (s)</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="np. 31"
+                            value={averageSegmentTime}
+                            onChangeText={setAverageSegmentTime}
+                            keyboardType="numeric"
+                        />
+
+                        <Pressable style={styles.nextButton} onPress={handleAddTask}>
+                            <Text style={styles.nextButtonText}>Dodaj kolejne zadanie</Text>
+                        </Pressable>
+                        <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleSave}>
+                            <Text style={styles.nextButtonText}>Zakończ i zapisz trening</Text>
+                        </Pressable>
+                    </>
+                )}
             </View>
-            <Text style={styles.label}>RPE sesji: {rpe}</Text>
-            <Slider
-                style={{width: "100%", height: 40}}
-                minimumValue={1}
-                maximumValue={10}
-                step={1}
-                value={rpe}
-                onValueChange={setRpe}
-                minimumTrackTintColor="#6366F1"
-            />
-            <Text style={styles.label}>Data treningu</Text>
-            <Pressable style={styles.dateBox} onPress={() => setShowDatePicker(true)}>
-                <Text style={styles.dateText}>{formattedDate}</Text>
-            </Pressable>
-            {showDatePicker && (
-                <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display="default"
-                    onValueChange={(event, selectedDate) => {
-                        setShowDatePicker(false);
-                        if (selectedDate) {
-                            setDate(selectedDate);
-                        }
-                    }}
-                />
-            )}
-        </View>
+        </TouchableWithoutFeedback>
     )
 }
 
@@ -92,5 +235,23 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         paddingVertical: 10,
         paddingHorizontal: 14,
-        alignSelf: "flex-start"}
+        alignSelf: "flex-start"},
+    nextButton: {
+        backgroundColor: "#6366F1",
+        borderRadius: 16,
+        paddingVertical: 14,
+        alignItems: "center",
+        marginTop: 40},
+    nextButtonText: {
+        color: "#FFFFFF",
+        fontSize: 18,
+        fontFamily: "Montserrat_700Bold"},
+    input: {
+        backgroundColor: "#F5F5F7",
+        borderRadius: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 14,
+        fontSize: 16,
+        fontFamily: "Montserrat_400Regular",
+        color: "#1A1A1A"}
 })

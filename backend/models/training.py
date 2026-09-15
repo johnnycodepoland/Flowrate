@@ -9,10 +9,13 @@ class TrainingTask(BaseModel):
     task_break: int
     average_segment_time: int
 
-class Training(BaseModel):
-    id: int
+class TrainingCreate(BaseModel):
     date: date
     time: int
     distance: int
     RPE: int
     tasks: list[TrainingTask]
+
+# Dodajemy klasę dziedziczącą, aby uniknąć potrzeby wysyłania id przez backend
+class Training(TrainingCreate):
+    id: int

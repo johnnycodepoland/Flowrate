@@ -1,19 +1,19 @@
 from fastapi import APIRouter, HTTPException
 from backend.repositories.training_repository import training_repository
-from backend.models.training import Training
+from backend.models.training import Training, TrainingCreate
 from backend.services.training_load import calculate_percentage_fatigue
 
 router = APIRouter()
 
 @router.post("/trainings")
-def create_training(training: Training):
+def create_training(training: TrainingCreate):
     try:
-        training_repository.create_training(training)
+        new_id = training_repository.create_training(training)
     # Wyłapujemy błąd który zwróciło nam training_service.create_training(training)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return {"added": training}
+    return {"added": training, "id": new_id}
 
 @router.get("/trainings")
 def get_all_trainings():

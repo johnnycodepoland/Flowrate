@@ -12,14 +12,17 @@ class TrainingRepository:
     def create_training(self, training):
         try:
             self.cursor.execute(
-                """INSERT INTO trainings (id, date, time, distance, RPE) VALUES (?, ?, ?, ?, ?)""",
-                (training.id, training.date, training.time, training.distance, training.RPE)
+                """INSERT INTO trainings (date, time, distance, RPE) VALUES (?, ?, ?, ?)""",
+                (training.date, training.time, training.distance, training.RPE)
             )
+
+            # self.cursor.lastrowid zwraca id ostatnio wstawionego wiersza
+            new_training_id = self.cursor.lastrowid
 
             for task in training.tasks:
                 self.cursor.execute(
                     """INSERT INTO training_tasks (training_id, description, task_distance, task_reps, task_target_time, task_break, average_segment_time) VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                    (training.id, task.description, task.task_distance, task.task_reps, task.task_target_time, task.task_break, task.average_segment_time)
+                    (new_training_id, task.description, task.task_distance, task.task_reps, task.task_target_time, task.task_break, task.average_segment_time)
                 )
         except Exception as e:
             # Cofamy wszystkie dokonane, niezapisane zmiany w bazie dancyh
@@ -32,6 +35,8 @@ class TrainingRepository:
             raise
 
         self.connection.commit()
+
+        return new_training_id
 
     def get_all_trainings(self):
         self.cursor.execute(
