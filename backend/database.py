@@ -37,3 +37,6 @@ class Database:
                 """)
 
         self.connection.commit()
+
+    def get_cursor(self):
+        return self.connection.cursor()

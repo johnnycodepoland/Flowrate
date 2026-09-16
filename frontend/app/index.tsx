@@ -15,6 +15,15 @@ export default function Index() {
     });
     const router = useRouter();
     const [trainings, setTrainings] = useState([]);
+    const [fatigue, setFatigue] = useState(null);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetch("http://192.168.68.59:8000/fatigue")
+                .then(response => response.json())
+                .then(data => setFatigue(data.percentage_fatigue));
+        }, [])
+    );
 
     useFocusEffect(
         useCallback(() => {
@@ -37,7 +46,7 @@ export default function Index() {
         <View style={styles.topRow}>
             <View style={styles.percentageCircleContainer}>
                 <View style={styles.percentageCircle}>
-                    <Text style={styles.percentageText}>84%</Text>
+                    <Text style={styles.percentageText}>{fatigue !== null ? `${Math.round(fatigue)}%` : "..."}</Text>
                     <Text style={styles.fatigueText}>Obciążenie</Text>
                 </View>
             </View>

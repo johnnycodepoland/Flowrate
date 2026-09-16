@@ -4,23 +4,25 @@ from backend.database import Database
 database = Database()
 
 class TrainingRepository:
-    def __init__(self, cursor, connection):
-        self.cursor = cursor
+    def __init__(self, database):
+        self.connection = database.connection
 
-        self.connection = connection
+        self.database = database
 
     def create_training(self, training):
+        cursor = self.database.get_cursor()
+
         try:
-            self.cursor.execute(
+            cursor.execute(
                 """INSERT INTO trainings (date, time, distance, RPE) VALUES (?, ?, ?, ?)""",
                 (training.date, training.time, training.distance, training.RPE)
             )
 
             # self.cursor.lastrowid zwraca id ostatnio wstawionego wiersza
-            new_training_id = self.cursor.lastrowid
+            new_training_id = cursor.lastrowid
 
             for task in training.tasks:
-                self.cursor.execute(
+                cursor.execute(
                     """INSERT INTO training_tasks (training_id, description, task_distance, task_reps, task_target_time, task_break, average_segment_time) VALUES (?, ?, ?, ?, ?, ?, ?)""",
                     (new_training_id, task.description, task.task_distance, task.task_reps, task.task_target_time, task.task_break, task.average_segment_time)
                 )
@@ -39,29 +41,35 @@ class TrainingRepository:
         return new_training_id
 
     def get_all_trainings(self):
-        self.cursor.execute(
+        cursor = self.database.get_cursor()
+
+        cursor.execute(
             """SELECT * from trainings"""
         )
 
-        trainings = self.cursor.fetchall()
+        trainings = cursor.fetchall()
 
         return trainings
 
     def get_training_by_id(self, training_id):
-        training = self.cursor.execute("""SELECT * from trainings where id = ?""", (training_id,)).fetchone()
+        cursor = self.database.get_cursor()
 
-        tasks = self.cursor.execute("""SELECT * from training_tasks where training_id = ?""", (training_id,)).fetchall()
+        training = cursor.execute("""SELECT * from trainings where id = ?""", (training_id,)).fetchone()
+
+        tasks = cursor.execute("""SELECT * from training_tasks where training_id = ?""", (training_id,)).fetchall()
 
         return training, tasks
 
     def delete_training(self, training_id):
+        cursor = self.database.get_cursor()
+
         try:
-            self.cursor.execute(
+            cursor.execute(
                 """DELETE from training_tasks where training_id = ?""",
                 (training_id,)
             )
 
-            self.cursor.execute(
+            cursor.execute(
                 """DELETE from trainings where id = ?""",
                 (training_id,)
             )
@@ -75,19 +83,21 @@ class TrainingRepository:
         self.connection.commit()
 
     def update_training(self, training):
+        cursor = self.database.get_cursor()
+
         try:
-            self.cursor.execute(
+            cursor.execute(
                 """UPDATE trainings SET date = ?, time = ?, distance = ?, RPE = ? WHERE id = ?""",
                 (training.date, training.time, training.distance, training.RPE, training.id)
             )
 
-            self.cursor.execute(
+            cursor.execute(
                 """DELETE from training_tasks where training_id = ?""",
                 (training.id,)
             )
 
             for task in training.tasks:
-                self.cursor.execute(
+                cursor.execute(
                     """INSERT INTO training_tasks (training_id, description, task_distance, task_reps, task_target_time, task_break, average_segment_time) VALUES (?, ?, ?, ?, ?, ?, ?)""",
                     (training.id, task.description, task.task_distance, task.task_reps, task.task_target_time, task.task_break, task.average_segment_time)
                 )
@@ -101,17 +111,19 @@ class TrainingRepository:
         self.connection.commit()
 
     def get_all_trainings_with_tasks(self):
-        self.cursor.execute(
+        cursor = self.database.get_cursor()
+
+        cursor.execute(
             """SELECT * from trainings"""
         )
 
-        trainings = self.cursor.fetchall()
+        trainings = cursor.fetchall()
 
-        self.cursor.execute(
+        cursor.execute(
             """SELECT * from training_tasks"""
         )
 
-        tasks = self.cursor.fetchall()
+        tasks = cursor.fetchall()
 
         tasks_by_training_id = {}
 
@@ -131,4 +143,4 @@ class TrainingRepository:
 
         return trainings_with_tasks
 
-training_repository = TrainingRepository(database.cursor, database.connection)
+training_repository = TrainingRepository(database)
