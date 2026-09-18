@@ -44,7 +44,7 @@ class TrainingRepository:
         cursor = self.database.get_cursor()
 
         cursor.execute(
-            """SELECT * from trainings"""
+            """SELECT * from trainings order by date desc"""
         )
 
         trainings = cursor.fetchall()
