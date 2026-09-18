@@ -7,4 +7,4 @@ router = APIRouter()
 async def get_actual_weather(lat: float, lon: float):
     weather = await get_weather(lat, lon)
 
-    return {"weather": weather}
+    return weather

@@ -4,6 +4,7 @@ import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useRouter, useFocusEffect} from "expo-router";
+import * as Location from "expo-location";
 
 export default function Index() {
     const today = new Date().toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
@@ -16,6 +17,18 @@ export default function Index() {
     const router = useRouter();
     const [trainings, setTrainings] = useState([]);
     const [fatigue, setFatigue] = useState(null);
+    const [weather, setWeather] = useState(null);
+    const weatherIconMap = {
+        clear: "sunny",
+        partly_cloudy: "partly-sunny",
+        cloudy: "cloudy",
+        fog: "cloud",
+        drizzle: "rainy",
+        rain: "rainy",
+        snow: "snow",
+        thunderstorm: "thunderstorm",
+        unknown: "help-circle",
+    };
 
     useFocusEffect(
         useCallback(() => {
@@ -32,6 +45,24 @@ export default function Index() {
                 .then(data => setTrainings(data));
         }, [])
     );
+
+    useEffect(() => {
+        const fetchWeather = async () => {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+
+            if (status !== "granted") {
+                return;
+            }
+
+            const location = await Location.getCurrentPositionAsync({});
+
+            fetch(`http://192.168.68.59:8000/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}`)
+                .then(response => response.json())
+                .then(data => setWeather(data));
+        };
+
+        fetchWeather();
+    }, []);
 
     if (!fontLoaded) {
         return null;
@@ -53,8 +84,8 @@ export default function Index() {
             <View style={styles.dateBox}>
                 <Text style={styles.dateText}>{today}</Text>
                 <View style={{flexDirection: "row", alignItems: "center", gap: 4}}>
-                    <Ionicons name="sunny" size={16} color="#1A1A1A" />
-                    <Text style={styles.weatherText}>26°C</Text>
+                    <Ionicons name={weather !== null ? weatherIconMap[weather.condition] : "sunny"} size={16} color="#1A1A1A" />
+                    <Text style={styles.weatherText}>{weather !== null ? `${Math.round(weather.temperature)}°C` : "..."}</Text>
                 </View>
             </View>
         </View>
