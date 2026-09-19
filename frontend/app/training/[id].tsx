@@ -1,4 +1,4 @@
-import {Pressable, StyleSheet, ScrollView, Text, View} from "react-native";
+import {Pressable, StyleSheet, ScrollView, Text, View, Alert} from "react-native";
 import {useState, useEffect} from "react"
 import {useLocalSearchParams} from "expo-router";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
@@ -23,6 +23,18 @@ export default function TrainingDetails() {
         Inter_700Bold,
         Inter_400Regular,
     });
+
+    const handleOptionPress = () => {
+        Alert.alert(
+            "Trening",
+            "Co chcesz zrobić?",
+            [
+                { text: "Edytuj", onPress: () => router.push(`/edit-training/${id}`) },
+                { text: "Usuń", onPress: handleDelete, style: "desctructive"},
+                { text: "Anuluj", style: "cancel"},
+            ]
+        );
+    };
 
     if (!fontLoaded) {
         return null;
@@ -51,7 +63,7 @@ export default function TrainingDetails() {
                 <Text style={styles.pageTittle}>Pływanie</Text>
                 <Text style={styles.pageSubtitle}>{formattedDate}</Text>
              </View>
-             <Pressable style={styles.menuButton} onPress={handleDelete}>
+             <Pressable style={styles.menuButton} onPress={handleOptionPress}>
                 <Ionicons name="ellipsis-horizontal" size={24} color="#1A1A1A" />
              </Pressable>
              </View>
