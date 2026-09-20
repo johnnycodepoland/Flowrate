@@ -199,67 +199,69 @@ export default function AddTraining() {
                             animationType="slide"
                             presentationStyle="pageSheet"
                         >
-                            <View style={styles.modalContent}>
-                                <Pressable onPress={() => setModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
-                                    <Ionicons name="close" size={28} color="#1A1A1A" />
-                                </Pressable>
-                                <Text style={styles.label}>Opis zadania</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="np. 8x50m"
-                                    value={taskDescription}
-                                    onChangeText={setTaskDescription}
-                                />
+                            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                                <View style={styles.modalContent}>
+                                    <Pressable onPress={() => setModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
+                                        <Ionicons name="close" size={28} color="#1A1A1A" />
+                                    </Pressable>
+                                    <Text style={styles.label}>Opis zadania</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="np. 8x50m"
+                                        value={taskDescription}
+                                        onChangeText={setTaskDescription}
+                                    />
 
-                                <Text style={styles.label}>Dystans odcinka (m)</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="np. 1000"
-                                    value={taskDistance}
-                                    onChangeText={setTaskDistance}
-                                    keyboardType="numeric"
-                                />
+                                    <Text style={styles.label}>Dystans odcinka (m)</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="np. 1000"
+                                        value={taskDistance}
+                                        onChangeText={setTaskDistance}
+                                        keyboardType="numeric"
+                                    />
 
-                                <Text style={styles.label}>Liczba powtórzeń</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="np. 8"
-                                    value={taskReps}
-                                    onChangeText={setTaskReps}
-                                    keyboardType="numeric"
-                                />
+                                    <Text style={styles.label}>Liczba powtórzeń</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="np. 8"
+                                        value={taskReps}
+                                        onChangeText={setTaskReps}
+                                        keyboardType="numeric"
+                                    />
 
-                                <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="np. 30"
-                                    value={taskTargetTime}
-                                    onChangeText={setTaskTargetTime}
-                                    keyboardType="numeric"
-                                />
+                                    <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="np. 30"
+                                        value={taskTargetTime}
+                                        onChangeText={setTaskTargetTime}
+                                        keyboardType="numeric"
+                                    />
 
-                                <Text style={styles.label}>Przerwa (s)</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="np. 20"
-                                    value={taskBreak}
-                                    onChangeText={setTaskBreak}
-                                    keyboardType="numeric"
-                                />
+                                    <Text style={styles.label}>Przerwa (s)</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="np. 20"
+                                        value={taskBreak}
+                                        onChangeText={setTaskBreak}
+                                        keyboardType="numeric"
+                                    />
 
-                                <Text style={styles.label}>Średni czas powórzenia (s)</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="np. 31"
-                                    value={averageSegmentTime}
-                                    onChangeText={setAverageSegmentTime}
-                                    keyboardType="numeric"
-                                />
+                                    <Text style={styles.label}>Średni czas powórzenia (s)</Text>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="np. 31"
+                                        value={averageSegmentTime}
+                                        onChangeText={setAverageSegmentTime}
+                                        keyboardType="numeric"
+                                    />
 
-                                <Pressable style={styles.nextButton} onPress={handleAddTask}>
-                                    <Text style={styles.nextButtonText}>Zatwierdź</Text>
-                                </Pressable>
-                            </View>
+                                    <Pressable style={styles.nextButton} onPress={handleAddTask}>
+                                        <Text style={styles.nextButtonText}>Zatwierdź</Text>
+                                    </Pressable>
+                                </View>
+                            </TouchableWithoutFeedback>
                         </Modal>
                     </>
                 )}
