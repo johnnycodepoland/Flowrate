@@ -5,6 +5,7 @@ import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {useRouter} from "expo-router";
+import {Liquid} from 'liquid-gooey'
 
 export default function TrainingDetails() {
     const {id} = useLocalSearchParams();
@@ -108,7 +109,7 @@ export default function TrainingDetails() {
                         </View>
                     </View>
                     ))}
-                </View>
+             </View>
         </ScrollView>
     )
 }
