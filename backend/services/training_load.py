@@ -1,6 +1,5 @@
 import datetime
 import math
-
 from backend.models.training import Training
 
 def calculate_deviation(task_target_time, average_segment_time):

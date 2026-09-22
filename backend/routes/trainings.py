@@ -2,7 +2,6 @@ from fastapi import APIRouter, HTTPException
 from backend.repositories.training_repository import training_repository
 from backend.models.training import Training, TrainingCreate
 from backend.services.training_load import calculate_percentage_fatigue
-from backend.services.weather import get_weather
 
 router = APIRouter()
 

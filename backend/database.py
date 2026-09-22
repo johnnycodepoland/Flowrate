@@ -15,6 +15,9 @@ class Database:
         # Ten tryb pozwala na jednoczesne odczyty i zapisy bez blokowania się nawzajem tak mocno jak domyślny tryb
         self.cursor.execute("PRAGMA journal_mode=WAL")
 
+        # Ten tryb włączy pilnowanie kluczy obcych, czyli jeżeli warunek klucza nie zostanie spełniony to wiersz nie zostanie zapisany
+        self.cursor.execute("PRAGMA foreign_keys=ON")
+
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS trainings (
                 id INTEGER PRIMARY KEY,
@@ -29,11 +32,21 @@ class Database:
                 id INTEGER PRIMARY KEY,
                 training_id INTEGER,
                 description TEXT,
-                task_distance INTEGER,
                 task_reps INTEGER,
-                task_target_time INTEGER,
-                task_break INTEGER,
-                average_segment_time INTEGER)
+                task_break INTEGER)
+                """)
+
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS task_segments (
+                id INTEGER PRIMARY KEY,
+                task_id INTEGER,
+                position INTEGER,
+                description TEXT,
+                distance REAL,
+                target_time REAL,
+                average_time REAL,
+                times TEXT,
+                FOREIGN KEY (task_id) REFERENCES training_tasks (id))
                 """)
 
         self.connection.commit()
