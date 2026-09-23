@@ -108,16 +108,33 @@ class TrainingRepository:
                 (training.date, training.time, training.distance, training.RPE, training.id)
             )
 
-            cursor.execute(
-                """DELETE from training_tasks where training_id = ?""",
-                (training.id,)
-            )
+            tasks = cursor.execute("""SELECT * from training_tasks where training_id = ?""", (training.id,)).fetchall()
+
+            for old_task in tasks:
+                cursor.execute(
+                    """DELETE from task_segments where task_id = ?""",
+                    (old_task["id"],)
+                )
+
+                cursor.execute(
+                    """DELETE from training_tasks where id = ?""",
+                    (old_task["id"],)
+                )
 
             for task in training.tasks:
                 cursor.execute(
-                    """INSERT INTO training_tasks (training_id, description, task_distance, task_reps, task_target_time, task_break, average_segment_time) VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                    (training.id, task.description, task.task_distance, task.task_reps, task.task_target_time, task.task_break, task.average_segment_time)
+                    """INSERT INTO training_tasks (training_id, description, task_reps, task_break) VALUES (?, ?, ?, ?)""",
+                    (training.id, task.description, task.task_reps, task.task_break)
                 )
+
+                new_task_id = cursor.lastrowid
+
+                for segment in task.segments:
+                    cursor.execute(
+                        """INSERT INTO task_segments (task_id, position, description, distance, target_time, average_time, times) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                        (new_task_id, segment.position, segment.description, segment.distance, segment.target_time, segment.average_time, json.dumps(segment.times) if segment.times else None)
+                    )
+
         except Exception:
             # Cofamy wszystkie dokonane, niezapisane zmiany w bazie dancyh
             self.connection.rollback()
