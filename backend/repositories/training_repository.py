@@ -1,5 +1,6 @@
 from sqlite3 import IntegrityError
 from backend.database import Database
+import json
 
 database = Database()
 
@@ -23,16 +24,25 @@ class TrainingRepository:
 
             for task in training.tasks:
                 cursor.execute(
-                    """INSERT INTO training_tasks (training_id, description, task_distance, task_reps, task_target_time, task_break, average_segment_time) VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                    (new_training_id, task.description, task.task_distance, task.task_reps, task.task_target_time, task.task_break, task.average_segment_time)
+                    """INSERT INTO training_tasks (training_id, description, task_reps, task_break) VALUES (?, ?, ?, ?)""",
+                    (new_training_id, task.description, task.task_reps, task.task_break)
                 )
+
+                new_task_id = cursor.lastrowid
+
+                for segment in task.segments:
+                    cursor.execute(
+                        """INSERT INTO task_segments (task_id, position, description, distance, target_time, average_time, times) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                        (new_task_id, segment.position, segment.description, segment.distance, segment.target_time, segment.average_time, json.dumps(segment.times) if segment.times else None)
+                    )
+
         except Exception as e:
             # Cofamy wszystkie dokonane, niezapisane zmiany w bazie dancyh
             self.connection.rollback()
 
             # Sprawdziamy czy błąd który wystąpił to IntegrityError
             if isinstance(e, IntegrityError):
-                raise ValueError(f"Training with id {training.id} already exists")
+                raise ValueError(f"Training with id {new_training_id} already exists")
             # Przepusczamy błąd do warstwy która go wywyołała
             raise
 
@@ -58,7 +68,14 @@ class TrainingRepository:
 
         tasks = cursor.execute("""SELECT * from training_tasks where training_id = ?""", (training_id,)).fetchall()
 
-        return training, tasks
+        segments = []
+
+        for task in tasks:
+            segment = cursor.execute("""SELECT * from task_segments where task_id = ?""", (task["id"],)).fetchall()
+
+            segments.append(segment)
+
+        return training, tasks, segments
 
     def delete_training(self, training_id):
         cursor = self.database.get_cursor()
