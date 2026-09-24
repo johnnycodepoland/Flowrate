@@ -80,7 +80,14 @@ class TrainingRepository:
     def delete_training(self, training_id):
         cursor = self.database.get_cursor()
 
+        tasks = cursor.execute("""SELECT * from training_tasks where training_id = ?""", (training_id,)).fetchall()
+
         try:
+            for task in tasks:
+                cursor.execute("""DELETE from task_segments where task_id = ?""",
+                (task["id"],)
+            )
+
             cursor.execute(
                 """DELETE from training_tasks where training_id = ?""",
                 (training_id,)
@@ -90,6 +97,7 @@ class TrainingRepository:
                 """DELETE from trainings where id = ?""",
                 (training_id,)
             )
+
         except Exception:
             # Cofamy wszystkie dokonane, niezapisane zmiany w bazie dancyh
             self.connection.rollback()
@@ -159,9 +167,25 @@ class TrainingRepository:
 
         tasks = cursor.fetchall()
 
+        cursor.execute(
+            """SELECT * from task_segments"""
+        )
+
+        task_segments = cursor.fetchall()
+
+        segments_by_task_id = {}
+
         tasks_by_training_id = {}
 
+        for segment in task_segments:
+            if segment["task_id"]in segments_by_task_id:
+                segments_by_task_id[segment["task_id"]].append(segment)
+            else:
+                segments_by_task_id[segment["task_id"]] = [segment]
+
         for task in tasks:
+            task = dict(task)
+            task["segments"] = segments_by_task_id.get(task["id"], [])
             if task["training_id"] in tasks_by_training_id:
                 tasks_by_training_id[task["training_id"]].append(task)
             else:
@@ -171,7 +195,6 @@ class TrainingRepository:
 
         for training in trainings:
             training = dict(training)
-            # Korzstamy z get w celu zabezpieczenia się przed KeyError
             training["tasks"] = tasks_by_training_id.get(training["id"], [])
             trainings_with_tasks.append(training)
 
