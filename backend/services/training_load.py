@@ -2,9 +2,18 @@ import datetime
 import math
 from backend.models.training import Training
 
-def calculate_deviation(task_target_time, average_segment_time):
-    # Obliczamy procentowe odychlenie od planowanego czasu
-    deviation = (average_segment_time - task_target_time) / task_target_time
+def get_average_time(segment):
+    if segment.times is None:
+        return segment.average_time
+    else:
+        return sum(segment.times) / len(segment.times)
+
+def calculate_deviation(target_time, average_time):
+    if target_time is None or average_time is None:
+        return None
+
+    # Obliczamy procentowe odychlenie od planowanego czasu, korzystając z max, które ograniczy nam deviation do 0
+    deviation = max(0, (average_time - target_time) / target_time)
 
     return deviation
 
@@ -15,7 +24,15 @@ def calculate_average_deviation(tasks):
     deviations = []
 
     for task in tasks:
-        deviations.append(calculate_deviation(task.task_target_time, task.average_segment_time))
+        segments = task.segments
+
+        for segment in segments:
+            deviations.append(calculate_deviation(segment.target_time, get_average_time(segment)))
+
+    deviations = [number for number in deviations if number is not None]
+
+    if not deviations:
+        return 0
 
     average_deviation = sum(deviations) / len(deviations)
 
