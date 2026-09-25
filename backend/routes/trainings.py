@@ -28,7 +28,7 @@ def get_all_trainings():
 
 @router.get("/trainings/{training_id}")
 def get_training_by_id(training_id: int):
-    training, tasks = training_repository.get_training_by_id(training_id)
+    training, tasks, segments = training_repository.get_training_by_id(training_id)
 
     if training is None:
         raise HTTPException(status_code=404, detail="Training not found")
@@ -37,8 +37,13 @@ def get_training_by_id(training_id: int):
 
     training["tasks"] = []
 
-    for task in tasks:
-        training["tasks"].append(dict(task))
+    for i, task in enumerate(tasks):
+        task = dict(task)
+
+        # dict(segment) zamienia ten segment na zwykły słownik pythona z listy Sqlite3
+        task["segments"] = [dict(segment) for segment in segments[i]]
+
+        training["tasks"].append(task)
 
     return training
 
