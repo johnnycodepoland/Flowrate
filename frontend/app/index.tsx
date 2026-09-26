@@ -32,7 +32,7 @@ export default function Index() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch("http://192.168.68.59:8000/fatigue")
+            fetch("http://192.168.68.65:8000/fatigue")
                 .then(response => response.json())
                 .then(data => setFatigue(data.percentage_fatigue));
         }, [])
@@ -40,7 +40,7 @@ export default function Index() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch("http://192.168.68.59:8000/trainings")
+            fetch("http://192.168.68.65:8000/trainings")
                 .then(response => response.json())
                 .then(data => setTrainings(data));
         }, [])
@@ -56,7 +56,7 @@ export default function Index() {
 
             const location = await Location.getCurrentPositionAsync({});
 
-            fetch(`http://192.168.68.59:8000/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}`)
+            fetch(`http://192.168.68.65:8000/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}`)
                 .then(response => response.json())
                 .then(data => setWeather(data));
         };

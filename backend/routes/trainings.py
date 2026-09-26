@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter, HTTPException
 from backend.repositories.training_repository import training_repository
 from backend.models.training import Training, TrainingCreate
@@ -40,8 +41,15 @@ def get_training_by_id(training_id: int):
     for i, task in enumerate(tasks):
         task = dict(task)
 
-        # dict(segment) zamienia ten segment na zwykły słownik pythona z listy Sqlite3
-        task["segments"] = [dict(segment) for segment in segments[i]]
+        task["segments"] = []
+
+        for segment in segments[i]:
+            segment = dict(segment)
+
+            if segment["times"]:
+                segment["times"] = json.loads(segment["times"])
+
+            task["segments"].append(segment)
 
         training["tasks"].append(task)
 

@@ -12,6 +12,9 @@ def calculate_deviation(target_time, average_time):
     if target_time is None or average_time is None:
         return None
 
+    if target_time == 0:
+        return None
+
     # Obliczamy procentowe odychlenie od planowanego czasu, korzystając z max, które ograniczy nam deviation do 0
     deviation = max(0, (average_time - target_time) / target_time)
 

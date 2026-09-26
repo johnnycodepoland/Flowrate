@@ -15,11 +15,13 @@ export default function AddTraining() {
     const formattedDate = date.toLocaleDateString("pl-PL", {day: "numeric", month: "long", year: "numeric"});
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [taskDescription, setTaskDescription] = useState("");
-    const [taskDistance, setTaskDistance] = useState("");
     const [taskReps, setTaskReps] = useState("");
-    const [taskTargetTime, setTaskTargetTime] = useState("");
     const [taskBreak, setTaskBreak] = useState("");
-    const [averageSegmentTime, setAverageSegmentTime] = useState("");
+    const [segmentDescription, setSegmentDescription] = useState("");
+    const [distance, setDistance] = useState("");
+    const [targetTime, setTargetTime] = useState("");
+    const [averageTime, setAverageTime] = useState("");
+    const [times, setTimes] = useState([]);
     const [tasks, setTasks] = useState([]);
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
@@ -38,20 +40,29 @@ export default function AddTraining() {
     const handleAddTask = () => {
         const newTask = {
             description: taskDescription,
-            task_distance: Number(taskDistance),
             task_reps: Number(taskReps),
-            task_target_time: Number(taskTargetTime),
             task_break: Number(taskBreak),
-            average_segment_time: Number(averageSegmentTime),
+            segments: [
+                {
+                    position: 1,
+                    description: segmentDescription,
+                    distance: Number(distance),
+                    target_time: Number(targetTime),
+                    average_time: Number(averageTime),
+                    times: times,
+                }
+            ]
         };
         const updatedTasks = [...tasks, newTask];
         setTasks(updatedTasks);
         setTaskDescription("");
-        setTaskDistance("");
         setTaskReps("");
-        setTaskTargetTime("");
         setTaskBreak("");
-        setAverageSegmentTime("");
+        setSegmentDescription("");
+        setDistance("");
+        setTargetTime("");
+        setAverageTime("");
+        setTimes([]);
     };
 
     const handleSave = () => {
@@ -60,18 +71,25 @@ export default function AddTraining() {
         if (taskDescription.trim() !== "") {
             const lastTask = {
                 description: taskDescription,
-                task_distance: Number(taskDistance),
                 task_reps: Number(taskReps),
-                task_target_time: Number(taskTargetTime),
                 task_break: Number(taskBreak),
-                average_segment_time: Number(averageSegmentTime),
+                segments: [
+                    {
+                        position: 1,
+                        description: segmentDescription,
+                        distance: Number(distance),
+                        target_time: Number(targetTime),
+                        average_time: Number(averageTime),
+                        times: times,
+                    }
+                ]
             };
             allTasks = [...tasks, lastTask]
         }
 
 
-        const totalDistance = allTasks.reduce((sum, task) => sum + task.task_distance * task.task_reps, 0);
-        const totalTime = allTasks.reduce((sum, task) => sum + (task.task_target_time + task.task_break) * task.task_reps, 0);
+        const totalDistance = allTasks.reduce((sum, task) => sum + task.segments[0].distance * task.task_reps, 0);
+        const totalTime = allTasks.reduce((sum, task) => sum + (task.segments[0].target_time + task.task_break) * task.task_reps, 0);
 
         const newTraining = {
             date: date.toISOString().split("T")[0],
@@ -81,7 +99,7 @@ export default function AddTraining() {
             tasks: allTasks,
         };
 
-        fetch("http://192.168.68.59:8000/trainings", {
+        fetch("http://192.168.68.65:8000/trainings", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(newTraining),
@@ -153,8 +171,8 @@ export default function AddTraining() {
                         <TextInput
                             style={styles.input}
                             placeholder="np. 1000"
-                            value={taskDistance}
-                            onChangeText={setTaskDistance}
+                            value={distance}
+                            onChangeText={setDistance}
                             keyboardType="numeric"
                         />
 
@@ -171,8 +189,8 @@ export default function AddTraining() {
                         <TextInput
                             style={styles.input}
                             placeholder="np. 30"
-                            value={taskTargetTime}
-                            onChangeText={setTaskTargetTime}
+                            value={targetTime}
+                            onChangeText={setTargetTime}
                             keyboardType="numeric"
                         />
 
@@ -189,8 +207,8 @@ export default function AddTraining() {
                         <TextInput
                             style={styles.input}
                             placeholder="np. 31"
-                            value={averageSegmentTime}
-                            onChangeText={setAverageSegmentTime}
+                            value={averageTime}
+                            onChangeText={setAverageTime}
                             keyboardType="numeric"
                         />
 

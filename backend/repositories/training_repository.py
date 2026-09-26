@@ -178,7 +178,12 @@ class TrainingRepository:
         tasks_by_training_id = {}
 
         for segment in task_segments:
-            if segment["task_id"]in segments_by_task_id:
+            segment = dict(segment)
+
+            if segment["times"]:
+                segment["times"] = json.loads(segment["times"])
+
+            if segment["task_id"] in segments_by_task_id:
                 segments_by_task_id[segment["task_id"]].append(segment)
             else:
                 segments_by_task_id[segment["task_id"]] = [segment]
