@@ -57,7 +57,7 @@ def get_training_by_id(training_id: int):
 
 @router.delete("/trainings/{training_id}")
 def delete_training(training_id: int):
-    training, tasks = training_repository.get_training_by_id(training_id)
+    training, tasks, segments = training_repository.get_training_by_id(training_id)
 
     if training is None:
         raise HTTPException(status_code=404, detail="Training not found")
@@ -69,7 +69,7 @@ def delete_training(training_id: int):
 @router.put("/trainings/{training_id}")
 def update_training(training_id: int, training: Training):
     # Zapisujemy training pod inną nazwą zmiennej, aby nie nadpisywać już istniejącej zmiennej training
-    existing_training, tasks  = training_repository.get_training_by_id(training_id)
+    existing_training, tasks, segments  = training_repository.get_training_by_id(training_id)
 
     if existing_training is None:
         raise HTTPException(status_code=404, detail="Training not found")
