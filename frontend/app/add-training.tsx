@@ -23,6 +23,7 @@ export default function AddTraining() {
     const [averageTime, setAverageTime] = useState("");
     const [times, setTimes] = useState([]);
     const [tasks, setTasks] = useState([]);
+    const [currentSegments, setCurrentSegments] = useState([]);
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -42,22 +43,27 @@ export default function AddTraining() {
             description: taskDescription,
             task_reps: Number(taskReps),
             task_break: Number(taskBreak),
-            segments: [
-                {
-                    position: 1,
-                    description: segmentDescription,
-                    distance: Number(distance),
-                    target_time: Number(targetTime),
-                    average_time: Number(averageTime),
-                    times: times,
-                }
-            ]
+            segments: currentSegments,
         };
         const updatedTasks = [...tasks, newTask];
         setTasks(updatedTasks);
         setTaskDescription("");
         setTaskReps("");
         setTaskBreak("");
+        setCurrentSegments([]);
+    };
+
+    const handleAddSegment = () => {
+        const newSegment = {
+            position: currentSegments.length + 1,
+            description: segmentDescription,
+            distance: Number(distance),
+            target_time: Number(targetTime),
+            average_time: Number(averageTime),
+            times: times,
+        };
+        const updatedSegments = [...currentSegments, newSegment];
+        setCurrentSegments(updatedSegments);
         setSegmentDescription("");
         setDistance("");
         setTargetTime("");
@@ -73,16 +79,7 @@ export default function AddTraining() {
                 description: taskDescription,
                 task_reps: Number(taskReps),
                 task_break: Number(taskBreak),
-                segments: [
-                    {
-                        position: 1,
-                        description: segmentDescription,
-                        distance: Number(distance),
-                        target_time: Number(targetTime),
-                        average_time: Number(averageTime),
-                        times: times,
-                    }
-                ]
+                segments: currentSegments
             };
             allTasks = [...tasks, lastTask]
         }
