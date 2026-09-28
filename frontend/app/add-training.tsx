@@ -74,6 +74,22 @@ export default function AddTraining() {
         setModalVisible(false);
     };
 
+    const getRepDistance = (task) => {
+        let repDistance = 0;
+        for (const segment of task.segments) {
+            repDistance = repDistance + segment.distance;
+        }
+        return repDistance;
+    }
+
+    const getRepTime = (task) => {
+        let repTime = 0;
+        for (const segment of task.segments) {
+            repTime = repTime + segment.target_time;
+        }
+        return repTime;
+    }
+
     const handleSave = () => {
         let allTasks = tasks;
 
@@ -87,9 +103,8 @@ export default function AddTraining() {
             allTasks = [...tasks, lastTask]
         }
 
-
-        const totalDistance = allTasks.reduce((sum, task) => sum + task.segments[0].distance * task.task_reps, 0);
-        const totalTime = allTasks.reduce((sum, task) => sum + (task.segments[0].target_time + task.task_break) * task.task_reps, 0);
+        const totalDistance = allTasks.reduce((sum, task) => sum + getRepDistance(task) * task.task_reps, 0);
+        const totalTime = allTasks.reduce((sum, task) => sum + (getRepTime(task) + task.task_break) * task.task_reps, 0);
 
         const newTraining = {
             date: date.toISOString().split("T")[0],
