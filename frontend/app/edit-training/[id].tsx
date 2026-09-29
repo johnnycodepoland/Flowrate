@@ -102,7 +102,7 @@ export default function AddTraining() {
             tasks: allTasks,
         };
 
-        fetch(`http://192.168.68.65:8000/trainings/${id}`, {
+        fetch(`http://192.168.68.63:8000/trainings/${id}`, {
             method: "PUT",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({...newTraining, id: Number(id)}),
@@ -115,7 +115,7 @@ export default function AddTraining() {
     };
 
     useEffect(() => {
-        fetch(`http://192.168.68.65:8000/trainings/${id}`)
+        fetch(`http://192.168.68.63:8000/trainings/${id}`)
             .then(response => response.json())
             .then(data => {
                 setRpe(data.RPE);;

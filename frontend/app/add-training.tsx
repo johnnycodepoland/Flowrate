@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal} from "react-native";
+import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert} from "react-native";
 import {useRouter} from "expo-router";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
@@ -41,6 +41,17 @@ export default function AddTraining() {
     };
 
     const handleAddTask = () => {
+        if (currentSegments.length === 0) {
+            Alert.alert(
+                "Trening",
+                "Nie dodano żadnego segmentu",
+                [
+                    { text: "Ok", style: "cancel"},
+                ]
+            );
+            return;
+        }
+
         const newTask = {
             description: taskDescription,
             task_reps: Number(taskReps),
@@ -93,7 +104,7 @@ export default function AddTraining() {
     const handleSave = () => {
         let allTasks = tasks;
 
-        if (taskDescription.trim() !== "") {
+        if (taskDescription.trim() !== "" && currentSegments.length > 0) {
             const lastTask = {
                 description: taskDescription,
                 task_reps: Number(taskReps),
@@ -114,7 +125,7 @@ export default function AddTraining() {
             tasks: allTasks,
         };
 
-        fetch("http://192.168.68.65:8000/trainings", {
+        fetch("http://192.168.68.63:8000/trainings", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(newTraining),
