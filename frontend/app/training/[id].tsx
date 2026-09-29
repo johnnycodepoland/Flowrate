@@ -18,6 +18,22 @@ export default function TrainingDetails() {
             .then(data => setTraining(data));
     }, []);
 
+    const getRepDistance = (task) => {
+        let repDistance = 0;
+        for (const segment of task.segments) {
+            repDistance = repDistance + segment.distance;
+        }
+        return repDistance;
+    }
+
+    const getRepTime = (task) => {
+        let repTime = 0;
+        for (const segment of task.segments) {
+            repTime = repTime + segment.target_time;
+        }
+        return repTime;
+    }
+
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -96,11 +112,11 @@ export default function TrainingDetails() {
                         <View style={styles.taskDetailsRow}>
                             <View style={styles.taskDetailItem}>
                                 <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
-                                <Text style={styles.taskDetailText}>{task.task_distance} m</Text>
+                                <Text style={styles.taskDetailText}>{getRepDistance(task)} m</Text>
                             </View>
                             <View style={styles.taskDetailItem}>
                                 <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
-                                <Text style={styles.taskDetailText}>{task.task_target_time}s → {task.average_segment_time}s</Text>
+                                <Text style={styles.taskDetailText}>{getRepTime(task)}s</Text>
                             </View>
                             <View style={styles.taskDetailItem}>
                                 <MaterialCommunityIcons name="pause-circle-outline" size={18} color="#1A1A1A" />
