@@ -11,6 +11,7 @@ export default function TrainingDetails() {
     const {id} = useLocalSearchParams();
     const router = useRouter();
     const [training, setTraining] = useState(null);
+    const [expandedIndex, setExpandedIndex] = useState(null);
 
     useEffect (() => {
         fetch(`http://192.168.68.63:8000/trainings/${id}`)
@@ -32,6 +33,14 @@ export default function TrainingDetails() {
             repTime = repTime + segment.target_time;
         }
         return repTime;
+    }
+
+    const toggleExpand = (index) => {
+        if (expandedIndex === index) {
+            setExpandedIndex(null)
+        } else {
+            setExpandedIndex(index)
+        }
     }
 
     const [fontLoaded] = useFonts({
@@ -107,7 +116,7 @@ export default function TrainingDetails() {
              <Text style={styles.sectionTitle}>Zadania</Text>
              <View style={styles.tasksList}>
                 {training.tasks.map((task, index) => (
-                    <View key={index} style={styles.taskCard}>
+                    <Pressable key={index} style={styles.taskCard} onPress={() => toggleExpand(index)}>
                         <Text style={styles.taskTitle}>{task.description}</Text>
                         <View style={styles.taskDetailsRow}>
                             <View style={styles.taskDetailItem}>
@@ -123,7 +132,16 @@ export default function TrainingDetails() {
                                 <Text style={styles.taskDetailText}>{task.task_break}s</Text>
                             </View>
                         </View>
-                    </View>
+                        {expandedIndex === index && task.segments.length > 1 && (
+                            <View style={styles.segmentsContainer}>
+                                {task.segments.map((segment, position) => (
+                                    <View key={segment.position} style={styles.taskDetailItem}>
+                                        <Text style={styles.segmentText}>{segment.description}: {segment.distance}m, {segment.target_time}s → {segment.average_time}s</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        )}
+                    </Pressable>
                     ))}
              </View>
         </ScrollView>
@@ -226,5 +244,15 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontFamily: "Inter_400Regular"},
     menuButton: {
-        marginLeft: "auto"}
+        marginLeft: "auto"},
+    segmentsContainer: {
+        marginTop: 12,
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: "#E0E0E0",
+        gap: 4},
+    segmentText: {
+        color: "#6B7280",
+        fontSize: 14,
+        fontFamily: "Inter_400Regular"}
 })
