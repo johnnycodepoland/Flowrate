@@ -1,5 +1,5 @@
 from datetime import date
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 class TaskSegmentsCreate(BaseModel):
@@ -26,7 +26,8 @@ class TrainingTask(TrainingTaskCreate):
 
 class TrainingCreate(BaseModel):
     date: date
-    time: int
+    # Dodajemy sprawdzenie czy time to liczba całkowita, poza zero
+    time: int = Field(gt=0)
     distance: int
     RPE: int
     tasks: list[TrainingTaskCreate]

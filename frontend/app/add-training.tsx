@@ -26,6 +26,7 @@ export default function AddTraining() {
     const [tasks, setTasks] = useState([]);
     const [currentSegments, setCurrentSegments] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
+    const [manualTime, setManualTime] = useState("")
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -117,9 +118,21 @@ export default function AddTraining() {
         const totalDistance = allTasks.reduce((sum, task) => sum + getRepDistance(task) * task.task_reps, 0);
         const totalTime = allTasks.reduce((sum, task) => sum + (getRepTime(task) + task.task_break) * task.task_reps, 0);
 
+        const enteredTime = Number(manualTime)
+        if (manualTime.trim() !== "" && (Number.isNaN(enteredTime) || enteredTime <= 0)) {
+            Alert.alert(
+                "Czas",
+                "Podany czas jest nie poprawny",
+                [
+                    { text: "Ok", style: "cancel"},
+                ]
+            );
+            return;
+        }
+
         const newTraining = {
             date: date.toISOString().split("T")[0],
-            time: Math.round(totalTime / 60),
+            time: manualTime.trim() !== "" ? Math.round(Number(manualTime)) : Math.round(totalTime / 60),
             distance: totalDistance,
             RPE: rpe,
             tasks: allTasks,
@@ -130,7 +143,13 @@ export default function AddTraining() {
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(newTraining),
         })
-            .then(() => router.push("/"));
+            .then((res) => {
+                if (!res.ok) {
+                    Alert.alert("Błąd", "Nie udało się zapisać treningu");
+                    return;
+                }
+                router.push("/")
+            });
     };
 
     if (!fontLoaded) {
@@ -149,6 +168,15 @@ export default function AddTraining() {
 
                 {step === 1 && (
                     <>
+                        <Text style={styles.label}>Czas treningu (min)</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="np. 90"
+                            value={manualTime}
+                            onChangeText={setManualTime}
+                            keyboardType="numeric"
+                        />
+                        <Text style={styles.hint}>Zostaw puste, żeby policzyć z segmentów.</Text>
                         <Text style={styles.label}>RPE sesji: {rpe}</Text>
                         <Slider
                             style={{width: "100%", height: 40}}
@@ -378,5 +406,10 @@ const styles = StyleSheet.create({
         borderRadius: 20},
     deleteActionText: {
         color: "#FFFFFF",
-        fontFamily: "Montserrat_700Bold"}
+        fontFamily: "Montserrat_700Bold"},
+    hint: {
+        fontSize: 12,
+        color: "#888",
+        marginTop: 4,
+        fontFamily: "Inter_400Regular"}
 })
