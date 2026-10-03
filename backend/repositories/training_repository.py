@@ -107,16 +107,16 @@ class TrainingRepository:
 
         self.connection.commit()
 
-    def update_training(self, training):
+    def update_training(self, training_id, training):
         cursor = self.database.get_cursor()
 
         try:
             cursor.execute(
                 """UPDATE trainings SET date = ?, time = ?, distance = ?, RPE = ? WHERE id = ?""",
-                (training.date, training.time, training.distance, training.RPE, training.id)
+                (training.date, training.time, training.distance, training.RPE, training_id)
             )
 
-            tasks = cursor.execute("""SELECT * from training_tasks where training_id = ?""", (training.id,)).fetchall()
+            tasks = cursor.execute("""SELECT * from training_tasks where training_id = ?""", (training_id,)).fetchall()
 
             for old_task in tasks:
                 cursor.execute(
@@ -132,7 +132,7 @@ class TrainingRepository:
             for task in training.tasks:
                 cursor.execute(
                     """INSERT INTO training_tasks (training_id, description, task_reps, task_break) VALUES (?, ?, ?, ?)""",
-                    (training.id, task.description, task.task_reps, task.task_break)
+                    (training_id, task.description, task.task_reps, task.task_break)
                 )
 
                 new_task_id = cursor.lastrowid

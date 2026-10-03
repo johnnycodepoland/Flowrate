@@ -67,17 +67,14 @@ def delete_training(training_id: int):
     return {"deleted": dict(training)}
 
 @router.put("/trainings/{training_id}")
-def update_training(training_id: int, training: Training):
+def update_training(training_id: int, training: TrainingCreate):
     # Zapisujemy training pod inną nazwą zmiennej, aby nie nadpisywać już istniejącej zmiennej training
     existing_training, tasks, segments  = training_repository.get_training_by_id(training_id)
 
     if existing_training is None:
         raise HTTPException(status_code=404, detail="Training not found")
 
-    if training_id != training.id:
-        raise HTTPException(status_code=409, detail="Conflict")
-
-    training_repository.update_training(training)
+    training_repository.update_training(training_id, training)
 
     return {"updated": training}
 
