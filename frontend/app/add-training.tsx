@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
         fontFamily: "Montserrat_700Bold"},
     hint: {
         fontSize: 12,
-        color: "#888",
+        color: "#6B7280",
         marginTop: 4,
         fontFamily: "Inter_400Regular"},
     footer: {
