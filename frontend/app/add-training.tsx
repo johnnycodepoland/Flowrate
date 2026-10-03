@@ -310,12 +310,12 @@ export default function AddTraining() {
                                             <Pressable
                                                 style={[styles.modeButton, timeMode === "average" && styles.modeButtonActive]}
                                                 onPress={() => setTimeMode("average")}>
-                                                <Text>Średni</Text>
+                                                <Text style={timeMode === "average" && {color: "#FFFFFF"}}>Średni</Text>
                                             </Pressable>
                                             <Pressable
                                                 style={[styles.modeButton, timeMode === "each" && styles.modeButtonActive]}
                                                 onPress={() => setTimeMode("each")}>
-                                                <Text>Każde powtórzenie</Text>
+                                                <Text style={timeMode === "each" && {color: "#FFFFFF"}}>Każde powtórzenie</Text>
                                             </Pressable>
                                         </View>
 
