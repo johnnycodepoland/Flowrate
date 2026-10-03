@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert} from "react-native";
+import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert, ScrollView} from "react-native";
 import {useRouter} from "expo-router";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
@@ -213,108 +213,112 @@ export default function AddTraining() {
 
                 {step === 2 && (
                     <>
-                        <Text style={styles.label}>Opis zadania</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="np. 8x50m"
-                            value={taskDescription}
-                            onChangeText={setTaskDescription}
-                        />
+                        <ScrollView contentContainerStyle={{paddingBottom: 20}}>
+                            <Text style={styles.label}>Opis zadania</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="np. 8x50m"
+                                value={taskDescription}
+                                onChangeText={setTaskDescription}
+                            />
 
-                        <Text style={styles.label}>Liczba powtórzeń</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="np. 8"
-                            value={taskReps}
-                            onChangeText={setTaskReps}
-                            keyboardType="numeric"
-                        />
+                            <Text style={styles.label}>Liczba powtórzeń</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="np. 8"
+                                value={taskReps}
+                                onChangeText={setTaskReps}
+                                keyboardType="numeric"
+                            />
 
-                        <Text style={styles.label}>Przerwa (s)</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="np. 20"
-                            value={taskBreak}
-                            onChangeText={setTaskBreak}
-                            keyboardType="numeric"
-                        />
+                            <Text style={styles.label}>Przerwa (s)</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="np. 20"
+                                value={taskBreak}
+                                onChangeText={setTaskBreak}
+                                keyboardType="numeric"
+                            />
 
-                        <View style={styles.tasksList}>
-                            {currentSegments.map((segment, index) => (
-                                <View key={segment.position} style={styles.taskCard}>
-                                    <Text style={styles.taskTitle}>{segment.description}</Text>
-                                    <View style={styles.taskDetailsRow}>
-                                        <View style={styles.taskDetailItem}>
-                                            <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
-                                            <Text style={styles.taskDetailText}>{segment.distance} m</Text>
-                                        </View>
-                                        <View style={styles.taskDetailItem}>
-                                            <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
-                                            <Text style={styles.taskDetailText}>{segment.target_time}s → {segment.average_time}s</Text>
+                            <View style={styles.tasksList}>
+                                {currentSegments.map((segment, index) => (
+                                    <View key={segment.position} style={styles.taskCard}>
+                                        <Text style={styles.taskTitle}>{segment.description}</Text>
+                                        <View style={styles.taskDetailsRow}>
+                                            <View style={styles.taskDetailItem}>
+                                                <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
+                                                <Text style={styles.taskDetailText}>{segment.distance} m</Text>
+                                            </View>
+                                            <View style={styles.taskDetailItem}>
+                                                <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
+                                                <Text style={styles.taskDetailText}>{segment.target_time}s → {segment.average_time}s</Text>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                            ))}
-                        </View>
-                        <Pressable style={styles.nextButton} onPress={() => setModalVisible(true)}>
-                            <Text style={styles.nextButtonText}>Dodaj nowy segment</Text>
-                        </Pressable>
-                        <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTask}>
-                            <Text style={styles.nextButtonText}>Dodaj kolejne zadanie</Text>
-                        </Pressable>
-                        <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleSave}>
-                            <Text style={styles.nextButtonText}>Zakończ i zapisz trening</Text>
-                        </Pressable>
-                        <Modal
-                            visible={modalVisible}
-                            animationType="slide"
-                            presentationStyle="pageSheet"
-                        >
-                            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                                <View style={styles.modalContent}>
-                                    <Pressable onPress={() => setModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
-                                        <Ionicons name="close" size={28} color="#1A1A1A" />
-                                    </Pressable>
-                                    <Text style={styles.label}>Opis segmentu</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="np. szybko"
-                                        value={segmentDescription}
-                                        onChangeText={setSegmentDescription}
-                                    />
+                                ))}
+                            </View>
+                            </ScrollView>
+                            <View style={styles.footer}>
+                                <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={() => setModalVisible(true)}>
+                                    <Text style={styles.nextButtonText}>Dodaj nowy segment</Text>
+                                </Pressable>
+                                <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={handleAddTask}>
+                                    <Text style={styles.nextButtonText}>Dodaj kolejne zadanie</Text>
+                                </Pressable>
+                                <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={handleSave}>
+                                    <Text style={styles.nextButtonText}>Zakończ i zapisz trening</Text>
+                                </Pressable>
+                            </View>
+                            <Modal
+                                visible={modalVisible}
+                                animationType="slide"
+                                presentationStyle="pageSheet"
+                            >
+                                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                                    <View style={styles.modalContent}>
+                                        <Pressable onPress={() => setModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
+                                            <Ionicons name="close" size={28} color="#1A1A1A" />
+                                        </Pressable>
+                                        <Text style={styles.label}>Opis segmentu</Text>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="np. szybko"
+                                            value={segmentDescription}
+                                            onChangeText={setSegmentDescription}
+                                        />
 
-                                    <Text style={styles.label}>Dystans segmentu (m)</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="np. 1000"
-                                        value={distance}
-                                        onChangeText={setDistance}
-                                        keyboardType="numeric"
-                                    />
+                                        <Text style={styles.label}>Dystans segmentu (m)</Text>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="np. 1000"
+                                            value={distance}
+                                            onChangeText={setDistance}
+                                            keyboardType="numeric"
+                                        />
 
-                                    <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="np. 30"
-                                        value={targetTime}
-                                        onChangeText={setTargetTime}
-                                        keyboardType="numeric"
-                                    />
+                                        <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="np. 30"
+                                            value={targetTime}
+                                            onChangeText={setTargetTime}
+                                            keyboardType="numeric"
+                                        />
 
-                                    <Text style={styles.label}>Średni czas powórzenia (s)</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="np. 31"
-                                        value={averageTime}
-                                        onChangeText={setAverageTime}
-                                        keyboardType="numeric"
-                                    />
+                                        <Text style={styles.label}>Średni czas powórzenia (s)</Text>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="np. 31"
+                                            value={averageTime}
+                                            onChangeText={setAverageTime}
+                                            keyboardType="numeric"
+                                        />
 
-                                    <Pressable style={styles.nextButton} onPress={handleAddSegment}>
-                                        <Text style={styles.nextButtonText}>Zatwierdź</Text>
-                                    </Pressable>
-                                </View>
-                            </TouchableWithoutFeedback>
+                                        <Pressable style={styles.nextButton} onPress={handleAddSegment}>
+                                            <Text style={styles.nextButtonText}>Zatwierdź</Text>
+                                        </Pressable>
+                                    </View>
+                                </TouchableWithoutFeedback>
                         </Modal>
                     </>
                 )}
@@ -411,5 +415,8 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: "#888",
         marginTop: 4,
-        fontFamily: "Inter_400Regular"}
+        fontFamily: "Inter_400Regular"},
+    footer: {
+        paddingBottom: 40,
+        gap: 12}
 })
