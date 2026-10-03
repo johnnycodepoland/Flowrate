@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         gap: 8},
     taskCard: {
-        height: 100,
+        minHeight: 100,
         backgroundColor: "#F5F5F7",
         borderRadius: 20,
         padding: 16},
