@@ -27,6 +27,7 @@ export default function AddTraining() {
     const [currentSegments, setCurrentSegments] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [manualTime, setManualTime] = useState("")
+    const [timeMode, setTimeMode] = useState("average");
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -305,14 +306,31 @@ export default function AddTraining() {
                                             keyboardType="numeric"
                                         />
 
-                                        <Text style={styles.label}>Średni czas powórzenia (s)</Text>
-                                        <TextInput
-                                            style={styles.input}
-                                            placeholder="np. 31"
-                                            value={averageTime}
-                                            onChangeText={setAverageTime}
-                                            keyboardType="numeric"
-                                        />
+                                        <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
+                                            <Pressable
+                                                style={[styles.modeButton, timeMode === "average" && styles.modeButtonActive]}
+                                                onPress={() => setTimeMode("average")}>
+                                                <Text>Średni</Text>
+                                            </Pressable>
+                                            <Pressable
+                                                style={[styles.modeButton, timeMode === "each" && styles.modeButtonActive]}
+                                                onPress={() => setTimeMode("each")}>
+                                                <Text>Każde powtórzenie</Text>
+                                            </Pressable>
+                                        </View>
+
+                                        {timeMode === "average" && (
+                                            <>
+                                                <Text style={styles.label}>Średni czas powórzenia (s)</Text>
+                                                <TextInput
+                                                    style={styles.input}
+                                                    placeholder="np. 31"
+                                                    value={averageTime}
+                                                    onChangeText={setAverageTime}
+                                                    keyboardType="numeric"
+                                                />
+                                            </>
+                                        )}
 
                                         <Pressable style={styles.nextButton} onPress={handleAddSegment}>
                                             <Text style={styles.nextButtonText}>Zatwierdź</Text>
@@ -418,5 +436,12 @@ const styles = StyleSheet.create({
         fontFamily: "Inter_400Regular"},
     footer: {
         paddingBottom: 40,
-        gap: 12}
+        gap: 12},
+    modeButton: {
+        backgroundColor: "#F5F5F7",
+        borderRadius: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 14},
+    modeButtonActive: {
+        backgroundColor: "#6366F1"}
 })
