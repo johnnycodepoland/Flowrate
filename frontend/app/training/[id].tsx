@@ -132,7 +132,7 @@ export default function TrainingDetails() {
                                 <Text style={styles.taskDetailText}>{task.task_break}s</Text>
                             </View>
                         </View>
-                        {expandedIndex === index && task.segments.length > 1 && (
+                        {expandedIndex === index && (
                             <View style={styles.segmentsContainer}>
                                 {task.segments.map((segment, position) => (
                                     <View key={segment.position} style={styles.taskDetailItem}>
