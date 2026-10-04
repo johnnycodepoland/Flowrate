@@ -28,6 +28,7 @@ export default function AddTraining() {
     const [modalVisible, setModalVisible] = useState(false);
     const [manualTime, setManualTime] = useState("")
     const [timeMode, setTimeMode] = useState("average");
+    const [timeInput, setTimeInput] = useState("");
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -40,6 +41,18 @@ export default function AddTraining() {
          } else {
              setStep(step - 1);
          }
+    };
+
+    const handleAddTime = () => {
+        if (timeInput.length === 0 || Number.isNaN(Number(timeInput))) {
+            return;
+        }
+        setTimes([...times, Number(timeInput)]);
+        setTimeInput("");
+    };
+
+    const handleRemoveTime = (indexToRemove) => {
+        setTimes(times.filter((t, index) => index !== indexToRemove));
     };
 
     const handleAddTask = () => {
@@ -69,13 +82,33 @@ export default function AddTraining() {
     };
 
     const handleAddSegment = () => {
+        let segmentAverage = Number(averageTime);
+
+        if (timeMode === "each") {
+            if (times.length === 0) {
+                Alert.alert(
+                    "Czasy",
+                    "Nie dodano żadnego czasu",
+                    [
+                        { text: "Ok", style: "cancel"},
+                    ]
+                );
+                return;
+                }
+                let sum = 0
+                for (const time of times) {
+                    sum = sum + time
+                }
+                segmentAverage = Math.round(sum / times.length * 10) / 10;
+                }
+
         const newSegment = {
             position: currentSegments.length + 1,
             description: segmentDescription,
             distance: Number(distance),
             target_time: Number(targetTime),
-            average_time: Number(averageTime),
-            times: times,
+            average_time: segmentAverage,
+            times: timeMode === "each" ? times : null,
         };
         const updatedSegments = [...currentSegments, newSegment];
         setCurrentSegments(updatedSegments);
@@ -84,6 +117,7 @@ export default function AddTraining() {
         setTargetTime("");
         setAverageTime("");
         setTimes([]);
+        setTimeInput("");
         setModalVisible(false);
     };
 
@@ -332,7 +366,33 @@ export default function AddTraining() {
                                             </>
                                         )}
 
-                                        <Pressable style={styles.nextButton} onPress={handleAddSegment}>
+                                        {timeMode === "each" && (
+                                            <>
+                                                <Text style={styles.label}>Czas powtórzenia (s)</Text>
+                                                <TextInput
+                                                    style={styles.input}
+                                                    placeholder="np. 32"
+                                                    value={timeInput}
+                                                    onChangeText={setTimeInput}
+                                                    keyboardType="numeric"
+                                                />
+                                                <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTime}>
+                                                    <Text style={styles.nextButtonText}>Dodaj</Text>
+                                                </Pressable>
+                                                {times.length > 0 && (
+                                                    <>
+                                                        <View style={styles.timesList}>
+                                                            {times.map((t, index) => (
+                                                                <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
+                                                                    <Text>{t}s ✕</Text>
+                                                                </Pressable>
+                                                            ))}
+                                                        </View>
+                                                    </>
+                                                )}
+                                            </>
+                                        )}
+                                        <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddSegment}>
                                             <Text style={styles.nextButtonText}>Zatwierdź</Text>
                                         </Pressable>
                                     </View>
@@ -443,5 +503,15 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 14},
     modeButtonActive: {
-        backgroundColor: "#6366F1"}
+        backgroundColor: "#6366F1"},
+    timesList: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 8,
+        marginTop:12},
+    timeChip: {
+        backgroundColor: "#F5F5F7",
+        borderRadius: 12,
+        paddingVertical: 6,
+        paddingHorizontal: 12}
 })
