@@ -35,6 +35,7 @@ export default function AddTraining() {
         Inter_700Bold,
         Inter_400Regular,
     });
+
     const handleBack = () => {
         if (step ===1) {
             router.back();
@@ -58,64 +59,6 @@ export default function AddTraining() {
         }
         return repTime;
     }
-
-    const handleAddTask = () => {
-        const newTask = {
-            description: taskDescription,
-            task_reps: Number(taskReps),
-            task_break: Number(taskBreak),
-            segments: [
-                {
-                    position: 1,
-                    description: segmentDescription,
-                    distance: Number(distance),
-                    target_time: Number(targetTime),
-                    average_time: Number(averageTime),
-                    times: times,
-                }
-            ]
-        };
-        const updatedTasks = [...tasks, newTask];
-        setTasks(updatedTasks);
-        setTaskDescription("");
-        setTaskReps("");
-        setTaskBreak("");
-        setSegmentDescription("");
-        setDistance("");
-        setTargetTime("");
-        setAverageTime("");
-        setTimes([]);
-    };
-
-    const handleSave = () => {
-        let allTasks = tasks;
-
-        if (taskDescription.trim() !== "") {
-            const lastTask = {
-                description: taskDescription,
-                task_reps: Number(taskReps),
-                task_break: Number(taskBreak),
-                segments: [
-                    {
-                        position: 1,
-                        description: segmentDescription,
-                        distance: Number(distance),
-                        target_time: Number(targetTime),
-                        average_time: Number(averageTime),
-                        times: times,
-                    }
-                ]
-            };
-            allTasks = [...tasks, lastTask]
-        }
-
-    const handleBack = () => {
-        if (step ===1) {
-            router.back();
-         } else {
-             setStep(step - 1);
-         }
-    };
 
     const handleAddTime = () => {
         if (timeInput.length === 0 || Number.isNaN(Number(timeInput))) {
@@ -195,6 +138,27 @@ export default function AddTraining() {
         setModalVisible(false);
     };
 
+    const handleSave = () => {
+        let allTasks = tasks;
+
+        if (taskDescription.trim() !== "") {
+            const lastTask = {
+                description: taskDescription,
+                task_reps: Number(taskReps),
+                task_break: Number(taskBreak),
+                segments: [
+                    {
+                        position: 1,
+                        description: segmentDescription,
+                        distance: Number(distance),
+                        target_time: Number(targetTime),
+                        average_time: Number(averageTime),
+                        times: times,
+                    }
+                ]
+            };
+            allTasks = [...tasks, lastTask]
+        }
 
         const totalDistance = allTasks.reduce((sum, task) => sum + getRepDistance(task) * task.task_reps, 0);
         const totalTime = allTasks.reduce((sum, task) => sum + (getRepTime(task) + task.task_break) * task.task_reps, 0);
