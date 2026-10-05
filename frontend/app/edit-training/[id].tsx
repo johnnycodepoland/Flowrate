@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react";
-import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alrty} from "react-native";
+import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert, ScrollView} from "react-native";
 import {useRouter, useLocalSearchParams} from "expo-router";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
@@ -25,6 +25,9 @@ export default function AddTraining() {
     const [averageTime, setAverageTime] = useState("");
     const [times, setTimes] = useState([]);
     const [tasks, setTasks] = useState([]);
+    const [currentSegments, setCurrentSegments] = useState([]);
+    const [timeMode, setTimeMode] = useState("average");
+    const [timeInput, setTimeInput] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
@@ -105,6 +108,92 @@ export default function AddTraining() {
             };
             allTasks = [...tasks, lastTask]
         }
+
+    const handleBack = () => {
+        if (step ===1) {
+            router.back();
+         } else {
+             setStep(step - 1);
+         }
+    };
+
+    const handleAddTime = () => {
+        if (timeInput.length === 0 || Number.isNaN(Number(timeInput))) {
+            return;
+        }
+        setTimes([...times, Number(timeInput)]);
+        setTimeInput("");
+    };
+
+    const handleRemoveTime = (indexToRemove) => {
+        setTimes(times.filter((t, index) => index !== indexToRemove));
+    };
+
+    const handleAddTask = () => {
+        if (currentSegments.length === 0) {
+            Alert.alert(
+                "Trening",
+                "Nie dodano żadnego segmentu",
+                [
+                    { text: "Ok", style: "cancel"},
+                ]
+            );
+            return;
+        }
+
+        const newTask = {
+            description: taskDescription,
+            task_reps: Number(taskReps),
+            task_break: Number(taskBreak),
+            segments: currentSegments,
+        };
+        const updatedTasks = [...tasks, newTask];
+        setTasks(updatedTasks);
+        setTaskDescription("");
+        setTaskReps("");
+        setTaskBreak("");
+        setCurrentSegments([]);
+    };
+
+    const handleAddSegment = () => {
+        let segmentAverage = Number(averageTime);
+
+        if (timeMode === "each") {
+            if (times.length === 0) {
+                Alert.alert(
+                    "Czasy",
+                    "Nie dodano żadnego czasu",
+                    [
+                        { text: "Ok", style: "cancel"},
+                    ]
+                );
+                return;
+                }
+                let sum = 0
+                for (const time of times) {
+                    sum = sum + time
+                }
+                segmentAverage = Math.round(sum / times.length * 10) / 10;
+                }
+
+        const newSegment = {
+            position: currentSegments.length + 1,
+            description: segmentDescription,
+            distance: Number(distance),
+            target_time: Number(targetTime),
+            average_time: segmentAverage,
+            times: timeMode === "each" ? times : null,
+        };
+        const updatedSegments = [...currentSegments, newSegment];
+        setCurrentSegments(updatedSegments);
+        setSegmentDescription("");
+        setDistance("");
+        setTargetTime("");
+        setAverageTime("");
+        setTimes([]);
+        setTimeInput("");
+        setModalVisible(false);
+    };
 
 
         const totalDistance = allTasks.reduce((sum, task) => sum + getRepDistance(task) * task.task_reps, 0);
