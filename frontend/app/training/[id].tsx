@@ -135,8 +135,11 @@ export default function TrainingDetails() {
                         {expandedIndex === index && (
                             <View style={styles.segmentsContainer}>
                                 {task.segments.map((segment, position) => (
-                                    <View key={segment.position} style={styles.taskDetailItem}>
+                                    <View key={segment.position}>
                                         <Text style={styles.segmentText}>{segment.description}: {segment.distance}m, {segment.target_time}s → {segment.average_time}s</Text>
+                                        {segment.times && segment.times.length > 0 && (
+                                            <Text style={styles.timesText}>{segment.times.join(" · ")}</Text>
+                                        )}
                                     </View>
                                 ))}
                             </View>
@@ -254,5 +257,10 @@ const styles = StyleSheet.create({
     segmentText: {
         color: "#6B7280",
         fontSize: 14,
-        fontFamily: "Inter_400Regular"}
+        fontFamily: "Inter_400Regular"},
+    timesText: {
+        color: "#6B7280",
+        fontsize: 12,
+        fontFamily: "Inter_400Regular",
+        marginTop: 2}
 })
