@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react";
-import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal} from "react-native";
+import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alrty} from "react-native";
 import {useRouter, useLocalSearchParams} from "expo-router";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
@@ -121,9 +121,15 @@ export default function AddTraining() {
         fetch(`http://192.168.68.63:8000/trainings/${id}`, {
             method: "PUT",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({...newTraining, id: Number(id)}),
+            body: JSON.stringify(newTraining),
         })
-            .then(() => router.push("/"));
+            .then((res) => {
+                if (!res.ok) {
+                    Alert.alert("Błąd", "Nie udało się zapisać treningu");
+                    return;
+                }
+                router.push("/")
+            });
     };
 
     const handleRemoveTask = (indexToRemove) => {
