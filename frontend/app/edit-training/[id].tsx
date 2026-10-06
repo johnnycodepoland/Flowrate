@@ -28,7 +28,8 @@ export default function AddTraining() {
     const [currentSegments, setCurrentSegments] = useState([]);
     const [timeMode, setTimeMode] = useState("average");
     const [timeInput, setTimeInput] = useState("");
-    const [modalVisible, setModalVisible] = useState(false);
+    const [taskModalVisible, setTaskModalVisible] = useState(false);
+    const [segmentModalVisible, setSegmentModalVisible] = useState(false);
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -96,6 +97,7 @@ export default function AddTraining() {
         setTaskReps("");
         setTaskBreak("");
         setCurrentSegments([]);
+        setTaskModalVisible(false);
     };
 
     const handleAddSegment = () => {
@@ -135,27 +137,18 @@ export default function AddTraining() {
         setAverageTime("");
         setTimes([]);
         setTimeInput("");
-        setModalVisible(false);
+        setSegmentModalVisible(false);
     };
 
     const handleSave = () => {
         let allTasks = tasks;
 
-        if (taskDescription.trim() !== "") {
+        if (taskDescription.trim() !== "" && currentSegments.length > 0) {
             const lastTask = {
                 description: taskDescription,
                 task_reps: Number(taskReps),
                 task_break: Number(taskBreak),
-                segments: [
-                    {
-                        position: 1,
-                        description: segmentDescription,
-                        distance: Number(distance),
-                        target_time: Number(targetTime),
-                        average_time: Number(averageTime),
-                        times: times,
-                    }
-                ]
+                segments: currentSegments
             };
             allTasks = [...tasks, lastTask]
         }
@@ -281,20 +274,20 @@ export default function AddTraining() {
                                 </Swipeable>
                             ))}
                         </View>
-                        <Pressable style={styles.nextButton} onPress={() => setModalVisible(true)}>
+                        <Pressable style={styles.nextButton} onPress={() => setTaskModalVisible(true)}>
                             <Text style={styles.nextButtonText}>Dodaj nowe zadanie</Text>
                         </Pressable>
                         <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleSave}>
                             <Text style={styles.nextButtonText}>Zakończ i zapisz trening</Text>
                         </Pressable>
                         <Modal
-                            visible={modalVisible}
+                            visible={taskModalVisible}
                             animationType="slide"
                             presentationStyle="pageSheet"
                         >
                             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                                 <View style={styles.modalContent}>
-                                    <Pressable onPress={() => setModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
+                                    <Pressable onPress={() => setTaskModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
                                         <Ionicons name="close" size={28} color="#1A1A1A" />
                                     </Pressable>
                                     <Text style={styles.label}>Opis zadania</Text>
@@ -305,30 +298,12 @@ export default function AddTraining() {
                                         onChangeText={setTaskDescription}
                                     />
 
-                                    <Text style={styles.label}>Dystans odcinka (m)</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="np. 1000"
-                                        value={distance}
-                                        onChangeText={setDistance}
-                                        keyboardType="numeric"
-                                    />
-
                                     <Text style={styles.label}>Liczba powtórzeń</Text>
                                     <TextInput
                                         style={styles.input}
                                         placeholder="np. 8"
                                         value={taskReps}
                                         onChangeText={setTaskReps}
-                                        keyboardType="numeric"
-                                    />
-
-                                    <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="np. 30"
-                                        value={targetTime}
-                                        onChangeText={setTargetTime}
                                         keyboardType="numeric"
                                     />
 
@@ -341,18 +316,123 @@ export default function AddTraining() {
                                         keyboardType="numeric"
                                     />
 
-                                    <Text style={styles.label}>Średni czas powórzenia (s)</Text>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="np. 31"
-                                        value={averageTime}
-                                        onChangeText={setAverageTime}
-                                        keyboardType="numeric"
-                                    />
-
-                                    <Pressable style={styles.nextButton} onPress={handleAddTask}>
+                                    <View style={styles.tasksList}>
+                                        {currentSegments.map((segment, index) => (
+                                            <View key={segment.position} style={styles.taskCard}>
+                                                <Text style={styles.taskTitle}>{segment.description}</Text>
+                                                <View style={styles.taskDetailsRow}>
+                                                    <View style={styles.taskDetailItem}>
+                                                        <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
+                                                        <Text style={styles.taskDetailText}>{segment.distance} m</Text>
+                                                    </View>
+                                                    <View style={styles.taskDetailItem}>
+                                                        <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
+                                                        <Text style={styles.taskDetailText}>{segment.target_time}s → {segment.average_time}s</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        ))}
+                                    </View>
+                                    <Pressable style={styles.nextButton} onPress={() => setSegmentModalVisible(true)}>
+                                        <Text style={styles.nextButtonText}>Dodaj nowy segment</Text>
+                                    </Pressable>
+                                    <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTask}>
                                         <Text style={styles.nextButtonText}>Zatwierdź</Text>
                                     </Pressable>
+                                    <Modal
+                                        visible={segmentModalVisible}
+                                        animationType="slide"
+                                        presentationStyle="pageSheet"
+                                    >
+                                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                                            <View style={styles.modalContent}>
+                                                <Pressable onPress={() => setSegmentModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
+                                                    <Ionicons name="close" size={28} color="#1A1A1A" />
+                                                </Pressable>
+                                                <Text style={styles.label}>Opis segmentu</Text>
+                                                <TextInput
+                                                    style={styles.input}
+                                                    placeholder="np. szybko"
+                                                    value={segmentDescription}
+                                                    onChangeText={setSegmentDescription}
+                                                />
+
+                                                <Text style={styles.label}>Dystans segmentu (m)</Text>
+                                                <TextInput
+                                                    style={styles.input}
+                                                    placeholder="np. 50"
+                                                    value={distance}
+                                                    onChangeText={setDistance}
+                                                    keyboardType="numeric"
+                                                />
+
+                                                <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
+                                                <TextInput
+                                                    style={styles.input}
+                                                    placeholder="np. 30"
+                                                    value={targetTime}
+                                                    onChangeText={setTargetTime}
+                                                    keyboardType="numeric"
+                                                />
+
+                                                <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
+                                                    <Pressable
+                                                        style={[styles.modeButton, timeMode === "average" && styles.modeButtonActive]}
+                                                        onPress={() => setTimeMode("average")}>
+                                                        <Text style={timeMode === "average" && {color: "#FFFFFF"}}>Średni</Text>
+                                                    </Pressable>
+                                                    <Pressable
+                                                        style={[styles.modeButton, timeMode === "each" && styles.modeButtonActive]}
+                                                        onPress={() => setTimeMode("each")}>
+                                                        <Text style={timeMode === "each" && {color: "#FFFFFF"}}>Każde powtórzenie</Text>
+                                                    </Pressable>
+                                                </View>
+
+                                                {timeMode === "average" && (
+                                                    <>
+                                                        <Text style={styles.label}>Średni czas powórzenia (s)</Text>
+                                                        <TextInput
+                                                            style={styles.input}
+                                                            placeholder="np. 31"
+                                                            value={averageTime}
+                                                            onChangeText={setAverageTime}
+                                                            keyboardType="numeric"
+                                                        />
+                                                    </>
+                                                )}
+
+                                                {timeMode === "each" && (
+                                                    <>
+                                                        <Text style={styles.label}>Czas powtórzenia (s)</Text>
+                                                        <TextInput
+                                                            style={styles.input}
+                                                            placeholder="np. 32"
+                                                            value={timeInput}
+                                                            onChangeText={setTimeInput}
+                                                            keyboardType="numeric"
+                                                        />
+                                                        <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTime}>
+                                                            <Text style={styles.nextButtonText}>Dodaj</Text>
+                                                        </Pressable>
+                                                        {times.length > 0 && (
+                                                            <>
+                                                                <View style={styles.timesList}>
+                                                                    {times.map((t, index) => (
+                                                                        <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
+                                                                            <Text>{t}s ✕</Text>
+                                                                        </Pressable>
+                                                                    ))}
+                                                                </View>
+                                                            </>
+                                                        )}
+                                                    </>
+                                                )}
+                                                <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddSegment}>
+                                                    <Text style={styles.nextButtonText}>Zatwierdź</Text>
+                                                </Pressable>
+                                            </View>
+                                        </TouchableWithoutFeedback>
+                                </Modal>
                                 </View>
                             </TouchableWithoutFeedback>
                         </Modal>
@@ -446,5 +526,22 @@ const styles = StyleSheet.create({
     modalContent: {
         flex: 1,
         paddingHorizontal: 20,
-        backgroundColor: "#FFFFFF"}
+        backgroundColor: "#FFFFFF"},
+    modeButton: {
+        backgroundColor: "#F5F5F7",
+        borderRadius: 12,
+        paddingVertical: 10,
+        paddingHorizontal: 14},
+    modeButtonActive: {
+        backgroundColor: "#6366F1"},
+    timesList: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 8,
+        marginTop:12},
+    timeChip: {
+        backgroundColor: "#F5F5F7",
+        borderRadius: 12,
+        paddingVertical: 6,
+        paddingHorizontal: 12}
 })
