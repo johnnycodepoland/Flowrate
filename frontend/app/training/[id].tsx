@@ -5,7 +5,8 @@ import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {useRouter} from "expo-router";
-import {Liquid} from 'liquid-gooey'
+import {Liquid} from 'liquid-gooey';
+import {API_URL} from "../../config";
 
 export default function TrainingDetails() {
     const {id} = useLocalSearchParams();
@@ -14,7 +15,7 @@ export default function TrainingDetails() {
     const [expandedIndex, setExpandedIndex] = useState(null);
 
     useEffect (() => {
-        fetch(`http://192.168.68.63:8000/trainings/${id}`)
+        fetch(`${API_URL}/trainings/${id}`)
             .then(response => response.json())
             .then(data => setTraining(data));
     }, []);
@@ -73,7 +74,7 @@ export default function TrainingDetails() {
     const formattedDate = new Date(training.date).toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
 
     const handleDelete = () => {
-        fetch(`http://192.168.68.63:8000/trainings/${id}`, {
+        fetch(`${API_URL}/trainings/${id}`, {
             method: "DELETE"
         })
             .then(() => router.back());

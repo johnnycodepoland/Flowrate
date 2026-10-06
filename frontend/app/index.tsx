@@ -5,6 +5,7 @@ import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useRouter, useFocusEffect} from "expo-router";
 import * as Location from "expo-location";
+import {API_URL} from "../config";
 
 export default function Index() {
     const today = new Date().toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
@@ -32,7 +33,7 @@ export default function Index() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch("http://192.168.68.63:8000/fatigue")
+            fetch(`${API_URL}/fatigue`)
                 .then(response => response.json())
                 .then(data => setFatigue(data.percentage_fatigue));
         }, [])
@@ -40,7 +41,7 @@ export default function Index() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch("http://192.168.68.63:8000/trainings")
+            fetch(`${API_URL}/trainings`)
                 .then(response => response.json())
                 .then(data => setTrainings(data));
         }, [])
@@ -56,7 +57,7 @@ export default function Index() {
 
             const location = await Location.getCurrentPositionAsync({});
 
-            fetch(`http://192.168.68.63:8000/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}`)
+           fetch(`${API_URL}/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}`)
                 .then(response => response.json())
                 .then(data => setWeather(data));
         };

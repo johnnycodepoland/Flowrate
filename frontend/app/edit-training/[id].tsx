@@ -7,6 +7,7 @@ import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Swipeable} from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import {API_URL} from "../../config";
 
 export default function AddTraining() {
     const {id} = useLocalSearchParams();
@@ -164,7 +165,7 @@ export default function AddTraining() {
             tasks: allTasks,
         };
 
-        fetch(`http://192.168.68.63:8000/trainings/${id}`, {
+        fetch(`${API_URL}/trainings/${id}`, {
             method: "PUT",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(newTraining),
@@ -183,7 +184,7 @@ export default function AddTraining() {
     };
 
     useEffect(() => {
-        fetch(`http://192.168.68.63:8000/trainings/${id}`)
+        fetch(`${API_URL}/trainings/${id}`)
             .then(response => response.json())
             .then(data => {
                 setRpe(data.RPE);;
