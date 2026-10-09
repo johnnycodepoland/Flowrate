@@ -8,6 +8,7 @@ import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Swipeable} from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {API_URL} from "../../config";
+import {parseDecimal} from "../../utils"
 
 export default function AddTraining() {
     const {id} = useLocalSearchParams();
@@ -63,10 +64,10 @@ export default function AddTraining() {
     }
 
     const handleAddTime = () => {
-        if (timeInput.length === 0 || Number.isNaN(Number(timeInput))) {
+        if (timeInput.length === 0 || Number.isNaN(parseDecimal(timeInput))) {
             return;
         }
-        setTimes([...times, Number(timeInput)]);
+        setTimes([...times, parseDecimal(timeInput)]);
         setTimeInput("");
     };
 
@@ -102,7 +103,7 @@ export default function AddTraining() {
     };
 
     const handleAddSegment = () => {
-        let segmentAverage = Number(averageTime);
+        let segmentAverage = parseDecimal(averageTime);
 
         if (timeMode === "each") {
             if (times.length === 0) {
@@ -126,7 +127,7 @@ export default function AddTraining() {
             position: currentSegments.length + 1,
             description: segmentDescription,
             distance: Number(distance),
-            target_time: Number(targetTime),
+            target_time: parseDecimal(targetTime),
             average_time: segmentAverage,
             times: timeMode === "each" ? times : null,
         };
@@ -305,7 +306,7 @@ export default function AddTraining() {
                                         placeholder="np. 8"
                                         value={taskReps}
                                         onChangeText={setTaskReps}
-                                        keyboardType="numeric"
+                                        keyboardType="number-pad"
                                     />
 
                                     <Text style={styles.label}>Przerwa (s)</Text>
@@ -314,7 +315,7 @@ export default function AddTraining() {
                                         placeholder="np. 20"
                                         value={taskBreak}
                                         onChangeText={setTaskBreak}
-                                        keyboardType="numeric"
+                                        keyboardType="number-pad"
                                     />
 
                                     <View style={styles.tasksList}>
@@ -364,7 +365,7 @@ export default function AddTraining() {
                                                     placeholder="np. 50"
                                                     value={distance}
                                                     onChangeText={setDistance}
-                                                    keyboardType="numeric"
+                                                    keyboardType="number-pad"
                                                 />
 
                                                 <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
@@ -373,7 +374,7 @@ export default function AddTraining() {
                                                     placeholder="np. 30"
                                                     value={targetTime}
                                                     onChangeText={setTargetTime}
-                                                    keyboardType="numeric"
+                                                    keyboardType="decimal-pad"
                                                 />
 
                                                 <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
@@ -397,7 +398,7 @@ export default function AddTraining() {
                                                             placeholder="np. 31"
                                                             value={averageTime}
                                                             onChangeText={setAverageTime}
-                                                            keyboardType="numeric"
+                                                            keyboardType="decimal-pad"
                                                         />
                                                     </>
                                                 )}
@@ -410,7 +411,7 @@ export default function AddTraining() {
                                                             placeholder="np. 32"
                                                             value={timeInput}
                                                             onChangeText={setTimeInput}
-                                                            keyboardType="numeric"
+                                                            keyboardType="decimal-pad"
                                                         />
                                                         <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTime}>
                                                             <Text style={styles.nextButtonText}>Dodaj</Text>
