@@ -46,10 +46,10 @@ export default function AddTraining() {
     };
 
     const handleAddTime = () => {
-        if (timeInput.length === 0 || Number.isNaN(ParseDecimal(timeInput))) {
+        if (timeInput.length === 0 || Number.isNaN(parseDecimal(timeInput))) {
             return;
         }
-        setTimes([...times, ParseDecimal(timeInput)]);
+        setTimes([...times, parseDecimal(timeInput)]);
         setTimeInput("");
     };
 
@@ -84,7 +84,7 @@ export default function AddTraining() {
     };
 
     const handleAddSegment = () => {
-        let segmentAverage = ParseDecimal(averageTime);
+        let segmentAverage = parseDecimal(averageTime);
 
         if (timeMode === "each") {
             if (times.length === 0) {
@@ -108,7 +108,7 @@ export default function AddTraining() {
             position: currentSegments.length + 1,
             description: segmentDescription,
             distance: Number(distance),
-            target_time: ParseDecimal(targetTime),
+            target_time: parseDecimal(targetTime),
             average_time: segmentAverage,
             times: timeMode === "each" ? times : null,
         };
@@ -159,7 +159,7 @@ export default function AddTraining() {
         if (manualTime.trim() !== "" && (Number.isNaN(enteredTime) || enteredTime <= 0)) {
             Alert.alert(
                 "Czas",
-                "Podany czas jest nie poprawny",
+                "Podany czas jest niepoprawny",
                 [
                     { text: "Ok", style: "cancel"},
                 ]
