@@ -7,6 +7,7 @@ import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {useRouter} from "expo-router";
 import {Liquid} from 'liquid-gooey';
 import {API_URL} from "../../config";
+import {hasAnyTime} from "../../utils"
 
 export default function TrainingDetails() {
     const {id} = useLocalSearchParams();
@@ -124,20 +125,24 @@ export default function TrainingDetails() {
                                 <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
                                 <Text style={styles.taskDetailText}>{getRepDistance(task)} m</Text>
                             </View>
-                            <View style={styles.taskDetailItem}>
-                                <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
-                                <Text style={styles.taskDetailText}>{getRepTime(task)}s</Text>
-                            </View>
-                            <View style={styles.taskDetailItem}>
-                                <MaterialCommunityIcons name="pause-circle-outline" size={18} color="#1A1A1A" />
-                                <Text style={styles.taskDetailText}>{task.task_break}s</Text>
-                            </View>
+                            {hasAnyTime(task) && (
+                                <>
+                                    <View style={styles.taskDetailItem}>
+                                        <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
+                                        <Text style={styles.taskDetailText}>{getRepTime(task)}s</Text>
+                                    </View>
+                                    <View style={styles.taskDetailItem}>
+                                        <MaterialCommunityIcons name="pause-circle-outline" size={18} color="#1A1A1A" />
+                                        <Text style={styles.taskDetailText}>{task.task_break}s</Text>
+                                    </View>
+                                </>
+                            )}
                         </View>
                         {expandedIndex === index && (
                             <View style={styles.segmentsContainer}>
                                 {task.segments.map((segment, position) => (
                                     <View key={segment.position}>
-                                        <Text style={styles.segmentText}>{segment.description}: {segment.distance}m, {segment.target_time}s → {segment.average_time}s</Text>
+                                        <Text style={styles.segmentText}>{segment.description}: {segment.distance}m, {segment.target_time !== null ? `${segment.target_time}s → ${segment.average_time}s` : `bez czasu`}</Text>
                                         {segment.times && segment.times.length > 0 && (
                                             <Text style={styles.timesText}>{segment.times.join(" · ")}</Text>
                                         )}

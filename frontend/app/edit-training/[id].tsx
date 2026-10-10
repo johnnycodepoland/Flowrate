@@ -8,7 +8,7 @@ import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Swipeable} from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {API_URL} from "../../config";
-import {parseDecimal} from "../../utils"
+import {parseDecimal, hasAnyTime} from "../../utils"
 
 export default function AddTraining() {
     const {id} = useLocalSearchParams();
@@ -33,6 +33,7 @@ export default function AddTraining() {
     const [taskModalVisible, setTaskModalVisible] = useState(false);
     const [segmentModalVisible, setSegmentModalVisible] = useState(false);
     const [manualTime, setManualTime] = useState("")
+    const [hasTime, setHasTime] = useState(true);
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -106,7 +107,7 @@ export default function AddTraining() {
     const handleAddSegment = () => {
         let segmentAverage = parseDecimal(averageTime);
 
-        if (timeMode === "each") {
+        if (hasTime && timeMode === "each") {
             if (times.length === 0) {
                 Alert.alert(
                     "Czasy",
@@ -128,9 +129,9 @@ export default function AddTraining() {
             position: currentSegments.length + 1,
             description: segmentDescription,
             distance: Number(distance),
-            target_time: parseDecimal(targetTime),
-            average_time: segmentAverage,
-            times: timeMode === "each" ? times : null,
+            target_time: hasTime ? parseDecimal(targetTime) : null,
+            average_time: hasTime ? segmentAverage : null,
+            times: timeMode === "each" && hasTime ? times : null,
         };
         const updatedSegments = [...currentSegments, newSegment];
         setCurrentSegments(updatedSegments);
@@ -141,6 +142,7 @@ export default function AddTraining() {
         setTimes([]);
         setTimeInput("");
         setSegmentModalVisible(false);
+        setHasTime(true);
     };
 
     const handleSave = () => {
@@ -286,10 +288,12 @@ export default function AddTraining() {
                                                 <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
                                                 <Text style={styles.taskDetailText}>{getRepDistance(task)} m</Text>
                                             </View>
-                                            <View style={styles.taskDetailItem}>
-                                                <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
-                                                <Text style={styles.taskDetailText}>{getRepTime(task)}s</Text>
-                                            </View>
+                                            {hasAnyTime(task) && (
+                                                <View style={styles.taskDetailItem}>
+                                                    <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
+                                                    <Text style={styles.taskDetailText}>{getRepTime(task)}s</Text>
+                                                </View>
+                                            )}
                                             <View style={styles.taskDetailItem}>
                                                 <MaterialCommunityIcons name="pause-circle-outline" size={18} color="#1A1A1A" />
                                                 <Text style={styles.taskDetailText}>{task.task_break}s</Text>
@@ -391,63 +395,80 @@ export default function AddTraining() {
                                                     keyboardType="number-pad"
                                                 />
 
-                                                <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    placeholder="np. 30"
-                                                    value={targetTime}
-                                                    onChangeText={setTargetTime}
-                                                    keyboardType="decimal-pad"
-                                                />
-
                                                 <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
                                                     <Pressable
-                                                        style={[styles.modeButton, timeMode === "average" && styles.modeButtonActive]}
-                                                        onPress={() => setTimeMode("average")}>
-                                                        <Text style={timeMode === "average" && {color: "#FFFFFF"}}>Średni</Text>
+                                                        style={[styles.modeButton, hasTime === true && styles.modeButtonActive]}
+                                                        onPress={() => setHasTime(true)}>
+                                                        <Text style={hasTime === true && {color: "#FFFFFF"}}>Z czasem</Text>
                                                     </Pressable>
                                                     <Pressable
-                                                        style={[styles.modeButton, timeMode === "each" && styles.modeButtonActive]}
-                                                        onPress={() => setTimeMode("each")}>
-                                                        <Text style={timeMode === "each" && {color: "#FFFFFF"}}>Każde powtórzenie</Text>
+                                                        style={[styles.modeButton, hasTime === false && styles.modeButtonActive]}
+                                                        onPress={() => setHasTime(false)}>
+                                                        <Text style={hasTime === false && {color: "#FFFFFF"}}>Bez czasu</Text>
                                                     </Pressable>
                                                 </View>
 
-                                                {timeMode === "average" && (
+                                                {hasTime && (
                                                     <>
-                                                        <Text style={styles.label}>Średni czas powórzenia (s)</Text>
+                                                        <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
                                                         <TextInput
                                                             style={styles.input}
-                                                            placeholder="np. 31"
-                                                            value={averageTime}
-                                                            onChangeText={setAverageTime}
+                                                            placeholder="np. 30"
+                                                            value={targetTime}
+                                                            onChangeText={setTargetTime}
                                                             keyboardType="decimal-pad"
                                                         />
-                                                    </>
-                                                )}
 
-                                                {timeMode === "each" && (
-                                                    <>
-                                                        <Text style={styles.label}>Czas powtórzenia (s)</Text>
-                                                        <TextInput
-                                                            style={styles.input}
-                                                            placeholder="np. 32"
-                                                            value={timeInput}
-                                                            onChangeText={setTimeInput}
-                                                            keyboardType="decimal-pad"
-                                                        />
-                                                        <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTime}>
-                                                            <Text style={styles.nextButtonText}>Dodaj</Text>
-                                                        </Pressable>
-                                                        {times.length > 0 && (
+                                                        <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
+                                                            <Pressable
+                                                                style={[styles.modeButton, timeMode === "average" && styles.modeButtonActive]}
+                                                                onPress={() => setTimeMode("average")}>
+                                                                <Text style={timeMode === "average" && {color: "#FFFFFF"}}>Średni</Text>
+                                                            </Pressable>
+                                                            <Pressable
+                                                                style={[styles.modeButton, timeMode === "each" && styles.modeButtonActive]}
+                                                                onPress={() => setTimeMode("each")}>
+                                                                <Text style={timeMode === "each" && {color: "#FFFFFF"}}>Każde powtórzenie</Text>
+                                                            </Pressable>
+                                                        </View>
+
+                                                        {timeMode === "average" && (
                                                             <>
-                                                                <View style={styles.timesList}>
-                                                                    {times.map((t, index) => (
-                                                                        <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
-                                                                            <Text>{t}s ✕</Text>
-                                                                        </Pressable>
-                                                                    ))}
-                                                                </View>
+                                                                <Text style={styles.label}>Średni czas powórzenia (s)</Text>
+                                                                <TextInput
+                                                                    style={styles.input}
+                                                                    placeholder="np. 31"
+                                                                    value={averageTime}
+                                                                    onChangeText={setAverageTime}
+                                                                    keyboardType="decimal-pad"
+                                                                />
+                                                            </>
+                                                        )}
+
+                                                        {timeMode === "each" && (
+                                                            <>
+                                                                <Text style={styles.label}>Czas powtórzenia (s)</Text>
+                                                                <TextInput
+                                                                    style={styles.input}
+                                                                    placeholder="np. 32"
+                                                                    value={timeInput}
+                                                                    onChangeText={setTimeInput}
+                                                                    keyboardType="decimal-pad"
+                                                                />
+                                                                <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTime}>
+                                                                    <Text style={styles.nextButtonText}>Dodaj</Text>
+                                                                </Pressable>
+                                                                {times.length > 0 && (
+                                                                    <>
+                                                                        <View style={styles.timesList}>
+                                                                            {times.map((t, index) => (
+                                                                                <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
+                                                                                    <Text>{t}s ✕</Text>
+                                                                                </Pressable>
+                                                                            ))}
+                                                                        </View>
+                                                                    </>
+                                                                )}
                                                             </>
                                                         )}
                                                     </>
