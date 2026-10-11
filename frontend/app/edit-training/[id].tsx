@@ -8,7 +8,7 @@ import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Swipeable} from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {API_URL} from "../../config";
-import {parseDecimal, hasAnyTime} from "../../utils"
+import {parseDecimal, hasAnyTime, showError} from "../../utils"
 
 export default function AddTraining() {
     const {id} = useLocalSearchParams();
@@ -89,6 +89,21 @@ export default function AddTraining() {
             return;
         }
 
+        if (taskDescription.trim() === "") {
+            showError("Podaj opis zadania")
+            return;
+        }
+
+        if (!(Number(taskReps) > 0)) {
+            showError("Podaj ilość powtórzeń zadania")
+            return;
+        }
+
+        if (taskBreak.trim() === "" || !(Number(taskBreak) >= 0)) {
+            showError("Podaj przerwę (0, jeśli bez przerwy)")
+            return;
+        }
+
         const newTask = {
             description: taskDescription,
             task_reps: Number(taskReps),
@@ -124,6 +139,21 @@ export default function AddTraining() {
                 }
                 segmentAverage = Math.round(sum / times.length * 10) / 10;
                 }
+
+        if (!(Number(distance) > 0)) {
+            showError('Podaj dystans segmentu')
+            return;
+        }
+
+        if (hasTime && !(parseDecimal(targetTime) > 0)) {
+            showError('Podaj docelowy czas albo wybierz "Bez czasu"')
+            return;
+        }
+
+        if (hasTime && timeMode === "average" && !(parseDecimal(averageTime) > 0)) {
+            showError('Podaj średni czas albo wybierz "Bez czasu"')
+            return;
+        }
 
         const newSegment = {
             position: currentSegments.length + 1,
