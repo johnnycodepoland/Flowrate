@@ -320,7 +320,7 @@ export default function AddTraining() {
                                             </View>
                                             <View style={styles.taskDetailItem}>
                                                 <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
-                                                <Text style={styles.taskDetailText}>{segment.target_time}s → {segment.average_time}s</Text>
+                                                <Text style={styles.taskDetailText}>{segment.target_time !== null ? `${segment.target_time}s → ${segment.average_time}s` : "bez czasu"}</Text>
                                             </View>
                                         </View>
                                     </View>
