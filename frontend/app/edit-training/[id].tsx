@@ -301,44 +301,48 @@ export default function AddTraining() {
 
                 {step === 2 && (
                     <>
-                        <View style={styles.tasksList}>
-                            {tasks.map((task, index) => (
-                                <Swipeable
-                                    key={index}
-                                    renderRightActions={() => (
-                                        <Pressable style={styles.deleteAction} onPress={() => handleRemoveTask(index)}>
-                                            <Text style={styles.deleteActionText}>Usuń</Text>
-                                       </Pressable>
-                                    )}
-                                >
-                                    <View style={styles.taskCard}>
-                                        <Text style={styles.taskTitle}>{task.description}</Text>
-                                        <View style={styles.taskDetailsRow}>
-                                            <View style={styles.taskDetailItem}>
-                                                <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
-                                                <Text style={styles.taskDetailText}>{getRepDistance(task)} m</Text>
-                                            </View>
-                                            {hasAnyTime(task) && (
+                        <ScrollView contentContainerStyle={{paddingBottom: 20}}>
+                            <View style={styles.tasksList}>
+                                {tasks.map((task, index) => (
+                                    <Swipeable
+                                        key={index}
+                                        renderRightActions={() => (
+                                            <Pressable style={styles.deleteAction} onPress={() => handleRemoveTask(index)}>
+                                                <Text style={styles.deleteActionText}>Usuń</Text>
+                                            </Pressable>
+                                        )}
+                                    >
+                                        <View style={styles.taskCard}>
+                                            <Text style={styles.taskTitle}>{task.description}</Text>
+                                            <View style={styles.taskDetailsRow}>
                                                 <View style={styles.taskDetailItem}>
-                                                    <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
-                                                    <Text style={styles.taskDetailText}>{getRepTime(task)}s</Text>
+                                                    <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
+                                                    <Text style={styles.taskDetailText}>{getRepDistance(task)} m</Text>
                                                 </View>
-                                            )}
-                                            <View style={styles.taskDetailItem}>
-                                                <MaterialCommunityIcons name="pause-circle-outline" size={18} color="#1A1A1A" />
-                                                <Text style={styles.taskDetailText}>{task.task_break}s</Text>
+                                                {hasAnyTime(task) && (
+                                                    <View style={styles.taskDetailItem}>
+                                                        <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
+                                                        <Text style={styles.taskDetailText}>{getRepTime(task)}s</Text>
+                                                    </View>
+                                                )}
+                                                <View style={styles.taskDetailItem}>
+                                                    <MaterialCommunityIcons name="pause-circle-outline" size={18} color="#1A1A1A" />
+                                                    <Text style={styles.taskDetailText}>{task.task_break}s</Text>
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
-                                </Swipeable>
-                            ))}
+                                    </Swipeable>
+                                ))}
+                            </View>
+                        </ScrollView>
+                        <View style={styles.footer}>
+                            <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={() => setTaskModalVisible(true)}>
+                                <Text style={styles.nextButtonText}>Dodaj nowe zadanie</Text>
+                            </Pressable>
+                            <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={handleSave}>
+                                <Text style={styles.nextButtonText}>Zakończ i zapisz trening</Text>
+                            </Pressable>
                         </View>
-                        <Pressable style={styles.nextButton} onPress={() => setTaskModalVisible(true)}>
-                            <Text style={styles.nextButtonText}>Dodaj nowe zadanie</Text>
-                        </Pressable>
-                        <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleSave}>
-                            <Text style={styles.nextButtonText}>Zakończ i zapisz trening</Text>
-                        </Pressable>
                         <Modal
                             visible={taskModalVisible}
                             animationType="slide"
@@ -624,5 +628,8 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: "#888",
         marginTop: 4,
-        fontFamily: "Inter_400Regular"}
+        fontFamily: "Inter_400Regular"},
+    footer: {
+        paddingBottom: 40,
+        gap: 12},
 })
