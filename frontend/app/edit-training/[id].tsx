@@ -1,11 +1,11 @@
 import {useState, useEffect} from "react";
-import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert, ScrollView} from "react-native";
+import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert} from "react-native";
 import {useRouter, useLocalSearchParams} from "expo-router";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
-import {Swipeable} from "react-native-gesture-handler";
+import {Swipeable, ScrollView} from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {API_URL} from "../../config";
 import {parseDecimal, hasAnyTime, showError} from "../../utils"
