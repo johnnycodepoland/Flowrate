@@ -31,13 +31,19 @@ export default function AddTraining() {
     const [manualTime, setManualTime] = useState("")
     const [timeMode, setTimeMode] = useState("average");
     const [timeInput, setTimeInput] = useState("");
-    const [hasTime, setHasTime] = useState(true);
+    const [hasTime, setHasTime] = useState(true);               
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
         Inter_700Bold,
         Inter_400Regular,
     });
+
+    const handleRemoveSegment = (indexToRemove) => {
+        setCurrentSegments(currentSegments.filter((_, index) => index !== indexToRemove)
+            .map((segment, index) => ({...segment, position: index + 1})));
+    };
+
     const handleBack = () => {
         if (step ===1) {
             router.back();
@@ -308,24 +314,32 @@ export default function AddTraining() {
                                 onChangeText={setTaskBreak}
                                 keyboardType="number-pad"
                             />
-
-                            <View style={styles.tasksList}>
-                                {currentSegments.map((segment, index) => (
-                                    <View key={segment.position} style={styles.taskCard}>
-                                        <Text style={styles.taskTitle}>{segment.description}</Text>
-                                        <View style={styles.taskDetailsRow}>
-                                            <View style={styles.taskDetailItem}>
-                                                <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
-                                                <Text style={styles.taskDetailText}>{segment.distance} m</Text>
-                                            </View>
-                                            <View style={styles.taskDetailItem}>
-                                                <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
-                                                <Text style={styles.taskDetailText}>{segment.target_time !== null ? `${segment.target_time}s → ${segment.average_time}s` : "bez czasu"}</Text>
+                                <View style={styles.tasksList}>
+                                    {currentSegments.map((segment, index) => (
+                                    <Swipeable
+                                        key={index}
+                                        renderRightActions={() => (
+                                            <Pressable style={styles.deleteAction} onPress={() => handleRemoveSegment(index)}>
+                                                <Text style={styles.deleteActionText}>Usuń</Text>
+                                            </Pressable>
+                                        )}
+                                    >
+                                        <View style={styles.taskCard}>
+                                            <Text style={styles.taskTitle}>{segment.description}</Text>
+                                            <View style={styles.taskDetailsRow}>
+                                                <View style={styles.taskDetailItem}>
+                                                    <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
+                                                    <Text style={styles.taskDetailText}>{segment.distance} m</Text>
+                                                </View>
+                                                <View style={styles.taskDetailItem}>
+                                                    <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
+                                                    <Text style={styles.taskDetailText}>{segment.target_time !== null ? `${segment.target_time}s → ${segment.average_time}s` : "bez czasu"}</Text>
+                                                </View>
                                             </View>
                                         </View>
-                                    </View>
-                                ))}
-                            </View>
+                                    </Swipeable>
+                                    ))}
+                                </View>
                             </ScrollView>
                             <View style={styles.footer}>
                                 <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={() => setModalVisible(true)}>

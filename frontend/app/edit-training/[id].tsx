@@ -229,6 +229,11 @@ export default function AddTraining() {
         setTasks(tasks.filter((_, index) => index !== indexToRemove));
     };
 
+    const handleRemoveSegment = (indexToRemove) => {
+        setCurrentSegments(currentSegments.filter((_, index) => index !== indexToRemove)
+            .map((segment, index) => ({...segment, position: index + 1})));
+    };
+
     useEffect(() => {
         fetch(`${API_URL}/trainings/${id}`)
             .then(response => response.json())
@@ -381,19 +386,28 @@ export default function AddTraining() {
 
                                     <View style={styles.tasksList}>
                                         {currentSegments.map((segment, index) => (
-                                            <View key={segment.position} style={styles.taskCard}>
-                                                <Text style={styles.taskTitle}>{segment.description}</Text>
-                                                <View style={styles.taskDetailsRow}>
-                                                    <View style={styles.taskDetailItem}>
-                                                        <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
-                                                        <Text style={styles.taskDetailText}>{segment.distance} m</Text>
-                                                    </View>
-                                                    <View style={styles.taskDetailItem}>
-                                                        <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
-                                                        <Text style={styles.taskDetailText}>{segment.target_time !== null ? `${segment.target_time}s → ${segment.average_time}s` : "bez czasu"}</Text>
+                                        <Swipeable
+                                                key={index}
+                                                renderRightActions={() => (
+                                                    <Pressable style={styles.deleteAction} onPress={() => handleRemoveSegment(index)}>
+                                                        <Text style={styles.deleteActionText}>Usuń</Text>
+                                                    </Pressable>
+                                                )}
+                                            >
+                                                <View key={segment.position} style={styles.taskCard}>
+                                                    <Text style={styles.taskTitle}>{segment.description}</Text>
+                                                    <View style={styles.taskDetailsRow}>
+                                                        <View style={styles.taskDetailItem}>
+                                                            <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
+                                                            <Text style={styles.taskDetailText}>{segment.distance} m</Text>
+                                                        </View>
+                                                        <View style={styles.taskDetailItem}>
+                                                            <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
+                                                            <Text style={styles.taskDetailText}>{segment.target_time !== null ? `${segment.target_time}s → ${segment.average_time}s` : "bez czasu"}</Text>
+                                                        </View>
                                                     </View>
                                                 </View>
-                                            </View>
+                                            </Swipeable>
                                         ))}
                                     </View>
                                     <Pressable style={styles.nextButton} onPress={() => setSegmentModalVisible(true)}>
