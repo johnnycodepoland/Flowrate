@@ -1,14 +1,14 @@
 import {useState} from "react";
-import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert, ScrollView} from "react-native";
+import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert} from "react-native";
 import {useRouter} from "expo-router";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import {Swipeable} from "react-native-gesture-handler";
+import {Swipeable, ScrollView} from "react-native-gesture-handler";
 import {API_URL} from "../config";
-import {parseDecimal, showError} from "../utils";
+import {parseDecimal, showError, hasAnyTime} from "../utils";
 
 export default function AddTraining() {
     const router = useRouter();
@@ -42,6 +42,10 @@ export default function AddTraining() {
     const handleRemoveSegment = (indexToRemove) => {
         setCurrentSegments(currentSegments.filter((_, index) => index !== indexToRemove)
             .map((segment, index) => ({...segment, position: index + 1})));
+    };
+
+    const handleRemoveTask = (indexToRemove) => {
+        setTasks(tasks.filter((_, index) => index !== indexToRemove));
     };
 
     const handleBack = () => {
@@ -289,6 +293,43 @@ export default function AddTraining() {
                 {step === 2 && (
                     <>
                         <ScrollView contentContainerStyle={{paddingBottom: 20}}>
+                            {tasks.length > 0 && (
+                                <>
+                                <Text style={styles.label}>Zadania</Text>
+                                    <View style={[styles.tasksList, {marginTop: 0}]}>
+                                        {tasks.map((task, index) => (
+                                            <Swipeable
+                                                key={index}
+                                                renderRightActions={() => (
+                                                    <Pressable style={styles.deleteAction} onPress={() => handleRemoveTask(index)}>
+                                                        <Text style={styles.deleteActionText}>Usuń</Text>
+                                                    </Pressable>
+                                                )}
+                                            >
+                                                <View style={styles.taskCard}>
+                                                    <Text style={styles.taskTitle}>{task.description}</Text>
+                                                    <View style={styles.taskDetailsRow}>
+                                                        <View style={styles.taskDetailItem}>
+                                                            <MaterialCommunityIcons name="map-marker-distance" size={18} color="#1A1A1A" />
+                                                            <Text style={styles.taskDetailText}>{getRepDistance(task)} m</Text>
+                                                        </View>
+                                                        {hasAnyTime(task) && (
+                                                            <View style={styles.taskDetailItem}>
+                                                                <MaterialCommunityIcons name="speedometer" size={18} color="#1A1A1A" />
+                                                                <Text style={styles.taskDetailText}>{getRepTime(task)}s</Text>
+                                                            </View>
+                                                        )}
+                                                        <View style={styles.taskDetailItem}>
+                                                            <MaterialCommunityIcons name="pause-circle-outline" size={18} color="#1A1A1A" />
+                                                            <Text style={styles.taskDetailText}>{task.task_break}s</Text>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                            </Swipeable>
+                                        ))}
+                                    </View>
+                                </>
+                            )}
                             <Text style={styles.label}>Opis zadania</Text>
                             <TextInput
                                 style={styles.input}
@@ -525,7 +566,6 @@ const styles = StyleSheet.create({
         marginTop: 20,
         gap: 8},
     taskCard: {
-        height: 100,
         backgroundColor: "#F5F5F7",
         borderRadius: 20,
         padding: 16},
