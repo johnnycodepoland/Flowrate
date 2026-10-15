@@ -492,35 +492,35 @@ export default function AddTraining() {
                                                                 />
                                                             </>
                                                         )}
-
-                                                        {timeMode === "each" && (
+                                                {timeMode === "each" && (
+                                                    <>
+                                                        <View style={{flexDirection: "row", gap: 8, alignItems: "center", marginTop: 20}}>
+                                                            <TextInput
+                                                                style={[styles.input, {flex: 1}]}
+                                                                placeholder="czas powtórzenia, np. 32"
+                                                                value={timeInput}
+                                                                onChangeText={setTimeInput}
+                                                                keyboardType="decimal-pad"
+                                                            />
+                                                            <Pressable style={[styles.nextButton, {marginTop: 0, paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12}]} onPress={handleAddTime}>
+                                                                <Text style={styles.nextButtonText}>Dodaj</Text>
+                                                            </Pressable>
+                                                        </View>
+                                                        {times.length > 0 && (
                                                             <>
-                                                                <Text style={styles.label}>Czas powtórzenia (s)</Text>
-                                                                <TextInput
-                                                                    style={styles.input}
-                                                                    placeholder="np. 32"
-                                                                    value={timeInput}
-                                                                    onChangeText={setTimeInput}
-                                                                    keyboardType="decimal-pad"
-                                                                />
-                                                                <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTime}>
-                                                                    <Text style={styles.nextButtonText}>Dodaj</Text>
-                                                                </Pressable>
-                                                                {times.length > 0 && (
-                                                                    <>
-                                                                        <View style={styles.timesList}>
-                                                                            {times.map((t, index) => (
-                                                                                <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
-                                                                                    <Text>{t}s ✕</Text>
-                                                                                </Pressable>
-                                                                            ))}
-                                                                        </View>
-                                                                    </>
-                                                                )}
+                                                                <View style={styles.timesList}>
+                                                                    {times.map((t, index) => (
+                                                                        <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
+                                                                            <Text>{t}s ✕</Text>
+                                                                        </Pressable>
+                                                                    ))}
+                                                                </View>
                                                             </>
                                                         )}
                                                     </>
                                                 )}
+                                            </>
+                                        )}
                                                 <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddSegment}>
                                                     <Text style={styles.nextButtonText}>Zatwierdź</Text>
                                                 </Pressable>

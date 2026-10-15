@@ -435,7 +435,7 @@ export default function AddTraining() {
 
                                         {hasTime && (
                                             <>
-                                                <Text style={styles.label}>Docelowy czas powórzenia (s)</Text>
+                                                <Text style={styles.label}>Docelowy czas powtórzenia (s)</Text>
                                                 <TextInput
                                                     style={styles.input}
                                                     placeholder="np. 30"
@@ -472,17 +472,18 @@ export default function AddTraining() {
 
                                                 {timeMode === "each" && (
                                                     <>
-                                                        <Text style={styles.label}>Czas powtórzenia (s)</Text>
-                                                        <TextInput
-                                                            style={styles.input}
-                                                            placeholder="np. 32"
-                                                            value={timeInput}
-                                                            onChangeText={setTimeInput}
-                                                            keyboardType="decimal-pad"
-                                                        />
-                                                        <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTime}>
-                                                            <Text style={styles.nextButtonText}>Dodaj</Text>
-                                                        </Pressable>
+                                                        <View style={{flexDirection: "row", gap: 8, alignItems: "center", marginTop: 20}}>
+                                                            <TextInput
+                                                                style={[styles.input, {flex: 1}]}
+                                                                placeholder="czas powtórzenia, np. 32"
+                                                                value={timeInput}
+                                                                onChangeText={setTimeInput}
+                                                                keyboardType="decimal-pad"
+                                                            />
+                                                            <Pressable style={[styles.nextButton, {marginTop: 0, paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12}]} onPress={handleAddTime}>
+                                                                <Text style={styles.nextButtonText}>Dodaj</Text>
+                                                            </Pressable>
+                                                        </View>
                                                         {times.length > 0 && (
                                                             <>
                                                                 <View style={styles.timesList}>
