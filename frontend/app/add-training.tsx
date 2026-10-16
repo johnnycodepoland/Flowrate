@@ -459,7 +459,7 @@ export default function AddTraining() {
 
                                                 {timeMode === "average" && (
                                                     <>
-                                                        <Text style={styles.label}>Średni czas powórzenia (s)</Text>
+                                                        <Text style={styles.label}>Średni czas powtórzenia (s)</Text>
                                                         <TextInput
                                                             style={styles.input}
                                                             placeholder="np. 31"
