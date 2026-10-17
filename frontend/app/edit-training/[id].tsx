@@ -421,111 +421,109 @@ export default function AddTraining() {
                                         animationType="slide"
                                         presentationStyle="pageSheet"
                                     >
-                                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                                            <View style={styles.modalContent}>
-                                                <Pressable onPress={() => setSegmentModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
-                                                    <Ionicons name="close" size={28} color="#1A1A1A" />
+                                        <ScrollView style={styles.modalContent} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets keyboardDismissMode="on-drag">
+                                            <Pressable onPress={() => setSegmentModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
+                                                <Ionicons name="close" size={28} color="#1A1A1A" />
+                                            </Pressable>
+                                            <Text style={styles.label}>Opis segmentu</Text>
+                                            <TextInput
+                                                style={styles.input}
+                                                placeholder="np. szybko"
+                                                value={segmentDescription}
+                                                onChangeText={setSegmentDescription}
+                                            />
+
+                                            <Text style={styles.label}>Dystans segmentu (m)</Text>
+                                            <TextInput
+                                                style={styles.input}
+                                                placeholder="np. 50"
+                                                value={distance}
+                                                onChangeText={setDistance}
+                                                keyboardType="number-pad"
+                                            />
+
+                                            <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
+                                                <Pressable
+                                                    style={[styles.modeButton, hasTime === true && styles.modeButtonActive]}
+                                                    onPress={() => setHasTime(true)}>
+                                                    <Text style={hasTime === true && {color: "#FFFFFF"}}>Z czasem</Text>
                                                 </Pressable>
-                                                <Text style={styles.label}>Opis segmentu</Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    placeholder="np. szybko"
-                                                    value={segmentDescription}
-                                                    onChangeText={setSegmentDescription}
-                                                />
-
-                                                <Text style={styles.label}>Dystans segmentu (m)</Text>
-                                                <TextInput
-                                                    style={styles.input}
-                                                    placeholder="np. 50"
-                                                    value={distance}
-                                                    onChangeText={setDistance}
-                                                    keyboardType="number-pad"
-                                                />
-
-                                                <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
-                                                    <Pressable
-                                                        style={[styles.modeButton, hasTime === true && styles.modeButtonActive]}
-                                                        onPress={() => setHasTime(true)}>
-                                                        <Text style={hasTime === true && {color: "#FFFFFF"}}>Z czasem</Text>
-                                                    </Pressable>
-                                                    <Pressable
-                                                        style={[styles.modeButton, hasTime === false && styles.modeButtonActive]}
-                                                        onPress={() => setHasTime(false)}>
-                                                        <Text style={hasTime === false && {color: "#FFFFFF"}}>Bez czasu</Text>
-                                                    </Pressable>
-                                                </View>
-
-                                                {hasTime && (
-                                                    <>
-                                                        <Text style={styles.label}>Docelowy czas powtórzenia (s)</Text>
-                                                        <TextInput
-                                                            style={styles.input}
-                                                            placeholder="np. 30"
-                                                            value={targetTime}
-                                                            onChangeText={setTargetTime}
-                                                            keyboardType="decimal-pad"
-                                                        />
-
-                                                        <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
-                                                            <Pressable
-                                                                style={[styles.modeButton, timeMode === "average" && styles.modeButtonActive]}
-                                                                onPress={() => setTimeMode("average")}>
-                                                                <Text style={timeMode === "average" && {color: "#FFFFFF"}}>Średni</Text>
-                                                            </Pressable>
-                                                            <Pressable
-                                                                style={[styles.modeButton, timeMode === "each" && styles.modeButtonActive]}
-                                                                onPress={() => setTimeMode("each")}>
-                                                                <Text style={timeMode === "each" && {color: "#FFFFFF"}}>Każde powtórzenie</Text>
-                                                            </Pressable>
-                                                        </View>
-
-                                                        {timeMode === "average" && (
-                                                            <>
-                                                                <Text style={styles.label}>Średni czas powtórzenia (s)</Text>
-                                                                <TextInput
-                                                                    style={styles.input}
-                                                                    placeholder="np. 31"
-                                                                    value={averageTime}
-                                                                    onChangeText={setAverageTime}
-                                                                    keyboardType="decimal-pad"
-                                                                />
-                                                            </>
-                                                        )}
-                                                {timeMode === "each" && (
-                                                    <>
-                                                        <View style={{flexDirection: "row", gap: 8, alignItems: "center", marginTop: 20}}>
-                                                            <TextInput
-                                                                style={[styles.input, {flex: 1}]}
-                                                                placeholder="czas powtórzenia, np. 32"
-                                                                value={timeInput}
-                                                                onChangeText={setTimeInput}
-                                                                keyboardType="decimal-pad"
-                                                            />
-                                                            <Pressable style={[styles.nextButton, {marginTop: 0, paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12}]} onPress={handleAddTime}>
-                                                                <Text style={styles.nextButtonText}>Dodaj</Text>
-                                                            </Pressable>
-                                                        </View>
-                                                        {times.length > 0 && (
-                                                            <>
-                                                                <View style={styles.timesList}>
-                                                                    {times.map((t, index) => (
-                                                                        <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
-                                                                            <Text>{t}s ✕</Text>
-                                                                        </Pressable>
-                                                                    ))}
-                                                                </View>
-                                                            </>
-                                                        )}
-                                                    </>
-                                                )}
-                                            </>
-                                        )}
-                                                <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddSegment}>
-                                                    <Text style={styles.nextButtonText}>Zatwierdź</Text>
+                                                <Pressable
+                                                    style={[styles.modeButton, hasTime === false && styles.modeButtonActive]}
+                                                    onPress={() => setHasTime(false)}>
+                                                    <Text style={hasTime === false && {color: "#FFFFFF"}}>Bez czasu</Text>
                                                 </Pressable>
                                             </View>
-                                        </TouchableWithoutFeedback>
+
+                                            {hasTime && (
+                                                <>
+                                                    <Text style={styles.label}>Docelowy czas powtórzenia (s)</Text>
+                                                    <TextInput
+                                                        style={styles.input}
+                                                        placeholder="np. 30"
+                                                        value={targetTime}
+                                                        onChangeText={setTargetTime}
+                                                        keyboardType="decimal-pad"
+                                                    />
+
+                                                    <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
+                                                        <Pressable
+                                                            style={[styles.modeButton, timeMode === "average" && styles.modeButtonActive]}
+                                                            onPress={() => setTimeMode("average")}>
+                                                            <Text style={timeMode === "average" && {color: "#FFFFFF"}}>Średni</Text>
+                                                        </Pressable>
+                                                        <Pressable
+                                                            style={[styles.modeButton, timeMode === "each" && styles.modeButtonActive]}
+                                                            onPress={() => setTimeMode("each")}>
+                                                            <Text style={timeMode === "each" && {color: "#FFFFFF"}}>Każde powtórzenie</Text>
+                                                        </Pressable>
+                                                    </View>
+
+                                                    {timeMode === "average" && (
+                                                        <>
+                                                            <Text style={styles.label}>Średni czas powtórzenia (s)</Text>
+                                                            <TextInput
+                                                                style={styles.input}
+                                                                placeholder="np. 31"
+                                                                value={averageTime}
+                                                                onChangeText={setAverageTime}
+                                                                keyboardType="decimal-pad"
+                                                            />
+                                                        </>
+                                                    )}
+                                            {timeMode === "each" && (
+                                                <>
+                                                    <View style={{flexDirection: "row", gap: 8, alignItems: "center", marginTop: 20}}>
+                                                        <TextInput
+                                                            style={[styles.input, {flex: 1}]}
+                                                            placeholder="czas powtórzenia, np. 32"
+                                                            value={timeInput}
+                                                            onChangeText={setTimeInput}
+                                                            keyboardType="decimal-pad"
+                                                        />
+                                                        <Pressable style={[styles.nextButton, {marginTop: 0, paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12}]} onPress={handleAddTime}>
+                                                            <Text style={styles.nextButtonText}>Dodaj</Text>
+                                                        </Pressable>
+                                                    </View>
+                                                    {times.length > 0 && (
+                                                        <>
+                                                            <View style={styles.timesList}>
+                                                                {times.map((t, index) => (
+                                                                    <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
+                                                                        <Text>{t}s ✕</Text>
+                                                                    </Pressable>
+                                                                ))}
+                                                            </View>
+                                                        </>
+                                                    )}
+                                                </>
+                                            )}
+                                        </>
+                                    )}
+                                            <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddSegment}>
+                                                <Text style={styles.nextButtonText}>Zatwierdź</Text>
+                                            </Pressable>
+                                        </ScrollView>
                                 </Modal>
                                 </View>
                             </TouchableWithoutFeedback>
