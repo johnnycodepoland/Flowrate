@@ -2,6 +2,31 @@ import datetime
 import math
 from backend.models.training import Training
 
+def get_pb_speed(distance, personal_bests):
+    distances = sorted(personal_bests)
+
+    if distance in personal_bests:
+        return distance / personal_bests[distance]
+
+    if distance < distances[0]:
+        return distances[0] / personal_bests[distances[0]]
+    if distance > distances[-1]:
+        return distances[-1] / personal_bests[distances[-1]]
+
+    # Funkcja zip będzie nam za każdym razem, łączyć kolejne elementy listy, (50, 100);(100, 200) itd, w celu sprawdzenia czy distance jest między nimi
+    for d1, d2 in zip(distances, distances[1:]):
+        if d1 < distance < d2:
+            # Liczymy prędkości dla każdej z dwóch wartośći z zip
+            v1 = d1 / personal_bests[d1]
+
+            v2 = d2 / personal_bests[d2]
+
+            # A następnie liczmymy w którym momencie drogi od d1 do d2, leży distance
+            location_between = (distance - d1) / (d2 - d1)
+
+            # Wyliczamy ostateczną prędkość PB dla distance
+            return v1 + (v2 - v1) * location_between
+
 def get_average_time(segment):
     if segment.times is None:
         return segment.average_time
@@ -85,7 +110,7 @@ def calculate_percentage_fatigue(trainings_with_tasks):
     maximum_value = 6000
     fatigue_sum = calculate_fatigue_sum(trainings_with_tasks)
 
-    # Korzystamy w wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb, aby uniknąć 100 procentowego obciążenia
+    # Korzystamy z wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb, aby uniknąć 100 procentowego obciążenia
     percentage_fatigue = min(100, (fatigue_sum / maximum_value) * 100)
 
     return percentage_fatigue
