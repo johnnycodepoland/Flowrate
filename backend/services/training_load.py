@@ -27,6 +27,18 @@ def get_pb_speed(distance, personal_bests):
             # Wyliczamy ostateczną prędkość PB dla distance
             return v1 + (v2 - v1) * location_between
 
+def get_critical_speed(personal_bests):
+    personal_best_400 = personal_bests[400]
+
+    personal_best_200 = personal_bests[200]
+
+    if personal_best_400 <= 2 * personal_best_200:
+        return None
+
+    critical_speed = (400 - 200) / (personal_best_400 - personal_best_200)
+
+    return critical_speed
+
 def get_average_time(segment):
     if segment.times is None:
         return segment.average_time
