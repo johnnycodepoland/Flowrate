@@ -39,8 +39,26 @@ def get_critical_speed(personal_bests):
 
     return critical_speed
 
+def segment_intensity(segment, critical_speed):
+    segment_average_time = get_average_time(segment)
+
+    if segment_average_time is None or segment_average_time <= 0:
+        return None
+
+    if critical_speed is None:
+        return None
+
+    if segment.distance is None or segment.distance <= 0:
+        return None
+
+    segment_speed = segment.distance / segment_average_time
+
+    intensity  = segment_speed / critical_speed
+
+    return intensity
+
 def get_average_time(segment):
-    if segment.times is None:
+    if segment.times is None or segment.times == []:
         return segment.average_time
     else:
         return sum(segment.times) / len(segment.times)
