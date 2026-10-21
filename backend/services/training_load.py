@@ -62,6 +62,18 @@ def segment_intensity(segment, critical_speed):
 
     return intensity
 
+def segment_reserve_usage(segment, critical_speed, personal_bests):
+    segment_speed = get_segment_speed(segment)
+
+    if segment_speed is None or critical_speed is None:
+        return None
+
+    pb_speed = get_pb_speed(segment.distance, personal_bests)
+
+    reserve_usage = max(0, min((segment_speed - critical_speed) / (pb_speed - critical_speed), 1))
+
+    return reserve_usage
+
 def get_average_time(segment):
     if segment.times is None or segment.times == []:
         return segment.average_time

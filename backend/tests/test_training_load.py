@@ -1,5 +1,5 @@
 import pytest
-from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed
+from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage
 from backend.models.training import TaskSegmentsCreate
 
 PERSONAL_BESTS = {50: 26.1, 100: 58.5, 200: 128.0, 400: 280.0}
@@ -60,6 +60,29 @@ SEGMENT_WITHOUT_DISTANCE = TaskSegmentsCreate(position=1, description="text", di
 def test_get_segment_speed_without_distance():
     result = get_segment_speed(SEGMENT_WITHOUT_DISTANCE)
     assert result is None
+
+def test_segment_reserve_usage():
+    assert segment_reserve_usage(SEGMENT, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(0.393, abs=0.001)
+
+SEGMENT_WITH_AVERAGE_TIME_85_S = TaskSegmentsCreate(position=1, description="text", distance=100, average_time=85)
+
+def test_segment_reserve_usage_with_average_time_85_seconds():
+    assert segment_reserve_usage(SEGMENT_WITH_AVERAGE_TIME_85_S, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == 0
+
+SEGMENT_WITH_AVERAGE_TIME_55_S = TaskSegmentsCreate(position=1, description="text", distance=100, average_time=55)
+
+def test_segment_reserve_usage_with_average_time_55_seconds():
+    assert segment_reserve_usage(SEGMENT_WITH_AVERAGE_TIME_55_S, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == 1
+
+SEGMENT_WITH_50_M_DISTANCE = TaskSegmentsCreate(position=1, description="text", distance=50, average_time=26.5)
+
+def test_segment_reserve_usage_with_50_m_distance():
+    assert segment_reserve_usage(SEGMENT_WITH_50_M_DISTANCE, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(0.951, abs=0.001)
+
+def test_segment_reserve_usage_without_times():
+    result = segment_reserve_usage(SEGMENT_WITHOUT_TIMES, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS)
+    assert result is None
+
 
 
 
