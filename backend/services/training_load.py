@@ -27,6 +27,19 @@ def get_pb_speed(distance, personal_bests):
             # Wyliczamy ostateczną prędkość PB dla distance
             return v1 + (v2 - v1) * location_between
 
+def get_segment_speed(segment):
+    segment_average_time = get_average_time(segment)
+
+    if segment_average_time is None or segment_average_time <= 0:
+        return None
+
+    if segment.distance is None or segment.distance <= 0:
+        return None
+
+    speed = segment.distance / segment_average_time
+
+    return speed
+
 def get_critical_speed(personal_bests):
     personal_best_400 = personal_bests[400]
 
@@ -40,18 +53,10 @@ def get_critical_speed(personal_bests):
     return critical_speed
 
 def segment_intensity(segment, critical_speed):
-    segment_average_time = get_average_time(segment)
+    segment_speed = get_segment_speed(segment)
 
-    if segment_average_time is None or segment_average_time <= 0:
+    if critical_speed is None or segment_speed is None:
         return None
-
-    if critical_speed is None:
-        return None
-
-    if segment.distance is None or segment.distance <= 0:
-        return None
-
-    segment_speed = segment.distance / segment_average_time
 
     intensity  = segment_speed / critical_speed
 

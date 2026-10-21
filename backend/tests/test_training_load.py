@@ -1,5 +1,5 @@
 import pytest
-from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity
+from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed
 from backend.models.training import TaskSegmentsCreate
 
 PERSONAL_BESTS = {50: 26.1, 100: 58.5, 200: 128.0, 400: 280.0}
@@ -50,6 +50,15 @@ def test_segment_intensity_without_times():
 
 def test_segment_intensity_with_none_critical_speed():
     result = segment_intensity(SEGMENT, critical_speed=None)
+    assert result is None
+
+def test_get_segment_speed():
+    assert get_segment_speed(SEGMENT) == pytest.approx(1.471, abs=0.001)
+
+SEGMENT_WITHOUT_DISTANCE = TaskSegmentsCreate(position=1, description="text", distance=0, average_time=68)
+
+def test_get_segment_speed_without_distance():
+    result = get_segment_speed(SEGMENT_WITHOUT_DISTANCE)
     assert result is None
 
 
