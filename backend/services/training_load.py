@@ -74,6 +74,29 @@ def segment_reserve_usage(segment, critical_speed, personal_bests):
 
     return reserve_usage
 
+def task_density(task):
+    rep_time = 0
+
+    if task.task_reps <= 0:
+        return None
+
+    for segment in task.segments:
+        average_segment_time = get_average_time(segment)
+
+        if average_segment_time is None:
+            continue
+
+        rep_time += average_segment_time
+
+    if rep_time == 0:
+        return None
+
+    work = rep_time * task.task_reps
+
+    breaks = task.task_break * (task.task_reps - 1)
+
+    return work / (work + breaks)
+
 def get_average_time(segment):
     if segment.times is None or segment.times == []:
         return segment.average_time
