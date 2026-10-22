@@ -1,6 +1,6 @@
 import pytest
-from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage
-from backend.models.training import TaskSegmentsCreate
+from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density
+from backend.models.training import TaskSegmentsCreate, TrainingTaskCreate
 
 PERSONAL_BESTS = {50: 26.1, 100: 58.5, 200: 128.0, 400: 280.0}
 
@@ -82,6 +82,45 @@ def test_segment_reserve_usage_with_50_m_distance():
 def test_segment_reserve_usage_without_times():
     result = segment_reserve_usage(SEGMENT_WITHOUT_TIMES, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS)
     assert result is None
+
+TASK = TrainingTaskCreate(description="text", task_reps=15, task_break=20, segments=[SEGMENT])
+
+def test_task_density():
+    assert task_density(TASK) == pytest.approx(0.785, abs=0.001)
+
+TASK_WITH_60_SECONDS_BREAK = TrainingTaskCreate(description="text", task_reps=15, task_break=60, segments=[SEGMENT])
+
+def test_task_density_with_60_seconds_break():
+    assert task_density(TASK_WITH_60_SECONDS_BREAK) == pytest.approx(0.548, abs=0.001)
+
+TASK_WITH_1_REP = TrainingTaskCreate(description="text", task_reps=1, task_break=20, segments=[SEGMENT])
+
+def test_task_density_with_1_rep():
+    assert task_density(TASK_WITH_1_REP) == pytest.approx(1)
+
+TASK_WITH_SEGMENT_WITHOUT_TIMES = TrainingTaskCreate(description="text", task_reps=1, task_break=20, segments=[SEGMENT_WITHOUT_TIMES])
+
+def test_task_density_with_segment_without_times():
+    result = task_density(TASK_WITH_SEGMENT_WITHOUT_TIMES)
+    assert result is None
+
+SECOND_SEGMENT = TaskSegmentsCreate(position=1, description="text", distance=50, average_time=28)
+
+THIRD_SEGMENT = TaskSegmentsCreate(position=2, description="text", distance=100, average_time=85)
+
+TASK_WITH_2_SEGMENTS = TrainingTaskCreate(description="text", task_reps=4, task_break=30, segments=[SECOND_SEGMENT, THIRD_SEGMENT])
+
+def test_task_density_with_2_segments():
+    assert task_density(TASK_WITH_2_SEGMENTS) == pytest.approx(0.834, abs=0.001)
+
+TASK_WITHOUT_REPS = TrainingTaskCreate(description="text", task_reps=0, task_break=20, segments=[SEGMENT])
+
+def test_task_density_with_task_without_reps():
+    result = task_density(TASK_WITHOUT_REPS)
+    assert result is None
+
+
+
 
 
 
