@@ -1,5 +1,5 @@
 import pytest
-from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density
+from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density, task_load
 from backend.models.training import TaskSegmentsCreate, TrainingTaskCreate
 
 PERSONAL_BESTS = {50: 26.1, 100: 58.5, 200: 128.0, 400: 280.0}
@@ -118,6 +118,35 @@ TASK_WITHOUT_REPS = TrainingTaskCreate(description="text", task_reps=0, task_bre
 def test_task_density_with_task_without_reps():
     result = task_density(TASK_WITHOUT_REPS)
     assert result is None
+
+TASK_FOR_TESTING_TASK_LOAD = TrainingTaskCreate(description="text", task_reps=15, task_break=20, segments=[SEGMENT])
+
+def test_task_load():
+    assert task_load(TASK_FOR_TESTING_TASK_LOAD, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(3755, abs=1)
+
+TASK_FOR_TESTING_TASK_LOAD_WITH_LONGER_BREAK = TrainingTaskCreate(description="text", task_reps=15, task_break=60, segments=[SEGMENT])
+
+def test_task_load_with_longer_break():
+    assert task_load(TASK_FOR_TESTING_TASK_LOAD_WITH_LONGER_BREAK, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(1813, abs=1)
+
+SEGMENT_FOR_TESTING_TASK_LOAD_20_TIMES_100_M = TaskSegmentsCreate(position=1, description="text", distance=100, average_time=85)
+
+TASK_FOR_TESTING_TASK_LOAD_20_TIMES_100_M = TrainingTaskCreate(description="text", task_reps=20, task_break=10, segments=[SEGMENT_FOR_TESTING_TASK_LOAD_20_TIMES_100_M])
+
+def test_task_load_with_task_20_times_100_m():
+    assert task_load(TASK_FOR_TESTING_TASK_LOAD_20_TIMES_100_M, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(1215, abs=1)
+
+TASK_FOR_TESTING_TASK_LOAD_WITH_1_REP = TrainingTaskCreate(description="text", task_reps=1, task_break=20, segments=[SEGMENT])
+
+def test_task_load_with_1_rep():
+    assert task_load(TASK_FOR_TESTING_TASK_LOAD_WITH_1_REP, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(94.9, abs=1)
+
+def test_task_load_with_segment_without_times():
+    assert task_load(TASK_WITH_SEGMENT_WITHOUT_TIMES, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(0)
+
+
+    
+
 
 
 

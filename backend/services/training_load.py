@@ -2,6 +2,15 @@ import datetime
 import math
 from backend.models.training import Training
 
+# Wykładnik intensywności
+INTENSITY_EXPONENT = 3
+
+# Waga gęstości
+DENSITY_WEIGHT = 15
+
+# Wykładnik gęstości
+DENSITY_EXPONENT = 5
+
 def get_pb_speed(distance, personal_bests):
     distances = sorted(personal_bests)
 
@@ -96,6 +105,32 @@ def task_density(task):
     breaks = task.task_break * (task.task_reps - 1)
 
     return work / (work + breaks)
+
+def task_load(task, critical_speed, personal_bests):
+    # Zadanie bez czasów nie daje obciążenia wewnętrznego
+    d = task_density(task)
+
+    if d is None:
+        return 0
+
+    # Obliczmy reapeat_factor który odpowiada za karę, za liczbę powtórzeń powyżej 1, które rozładowują naszą baterie
+    repeat_factor = (task.task_reps - 1) / task.task_reps
+
+    total_load = 0
+
+    for segment in task.segments:
+        I = segment_intensity(segment, critical_speed)
+
+        X = segment_reserve_usage(segment, critical_speed, personal_bests)
+
+        if I is None:
+            continue
+
+        segment_load = get_average_time(segment) * task.task_reps * I ** INTENSITY_EXPONENT * (1 + DENSITY_WEIGHT * d ** DENSITY_EXPONENT * X * repeat_factor)
+
+        total_load += segment_load
+
+    return total_load
 
 def get_average_time(segment):
     if segment.times is None or segment.times == []:
