@@ -132,6 +132,19 @@ def task_load(task, critical_speed, personal_bests):
 
     return total_load
 
+def training_load(training, personal_bests):
+    critical_speed = get_critical_speed(personal_bests)
+
+    total_load = 0
+
+    for task in training.tasks:
+        total_load += task_load(task, critical_speed, personal_bests)
+
+    return total_load
+
+def session_rpe(training):
+    return training.RPE * training.time
+
 def get_average_time(segment):
     if segment.times is None or segment.times == []:
         return segment.average_time

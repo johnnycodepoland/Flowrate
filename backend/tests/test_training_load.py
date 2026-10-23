@@ -1,6 +1,7 @@
 import pytest
-from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density, task_load
-from backend.models.training import TaskSegmentsCreate, TrainingTaskCreate
+from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density, task_load, training_load
+from backend.models.training import TaskSegmentsCreate, TrainingTaskCreate, TrainingCreate
+from datetime import date
 
 PERSONAL_BESTS = {50: 26.1, 100: 58.5, 200: 128.0, 400: 280.0}
 
@@ -144,7 +145,10 @@ def test_task_load_with_1_rep():
 def test_task_load_with_segment_without_times():
     assert task_load(TASK_WITH_SEGMENT_WITHOUT_TIMES, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(0)
 
+TRAINING = TrainingCreate(date=date(2026, 10, 23), time=90, distance=2000, RPE=8, tasks=[TASK_FOR_TESTING_TASK_LOAD, TASK_FOR_TESTING_TASK_LOAD_20_TIMES_100_M])
 
+def test_training_load():
+    assert training_load(TRAINING, PERSONAL_BESTS) == pytest.approx(4970, abs=1)
     
 
 
