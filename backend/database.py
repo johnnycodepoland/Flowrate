@@ -52,7 +52,13 @@ class Database:
                 times TEXT,
                 FOREIGN KEY (task_id) REFERENCES training_tasks (id))
                 """)
-
+        
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS personal_bests (
+                distance INTEGER PRIMARY KEY,
+                time REAL)
+                """)
+        
         self.connection.commit()
 
     def get_cursor(self):
