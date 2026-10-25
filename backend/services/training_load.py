@@ -154,55 +154,6 @@ def get_average_time(segment):
     else:
         return sum(segment.times) / len(segment.times)
 
-def calculate_deviation(target_time, average_time):
-    if target_time is None or average_time is None:
-        return None
-
-    if target_time == 0:
-        return None
-
-    # Obliczamy procentowe odychlenie od planowanego czasu, korzystając z max, które ograniczy nam deviation do 0
-    deviation = max(0, (average_time - target_time) / target_time)
-
-    return deviation
-
-def calculate_average_deviation(tasks):
-    if len(tasks) <= 0:
-        return 0
-
-    deviations = []
-
-    for task in tasks:
-        segments = task.segments
-
-        for segment in segments:
-            deviations.append(calculate_deviation(segment.target_time, get_average_time(segment)))
-
-    deviations = [number for number in deviations if number is not None]
-
-    if not deviations:
-        return 0
-
-    average_deviation = sum(deviations) / len(deviations)
-
-    return average_deviation
-
-def calculate_final_load(RPE, time, average_deviation):
-    base_load = RPE * time
-
-    final_load = base_load * (1 + average_deviation)
-
-    return final_load
-
-def calculate_training_load(training):
-    # Obliczamy średnie obciążenie
-    average_deviation = calculate_average_deviation(training.tasks)
-
-    # Obliczamy końcowe obciążenie
-    final_load = calculate_final_load(training.RPE, training.time, average_deviation)
-
-    return final_load
-
 # Ta funkcja policzy nam jak duże znaczenie ma mieć ten trening przy obliczaniu ostatecznego obciążenia
 def calculate_decay_weight(days_ago):
     # Stała zaniku
