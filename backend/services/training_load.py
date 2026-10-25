@@ -179,7 +179,7 @@ def calculate_fatigue_sum(trainings_with_tasks, personal_bests):
     return fatigue_sum
 
 def calculate_percentage_fatigue(trainings_with_tasks, personal_bests):
-    maximum_value = 6000
+    maximum_value = 25000
     fatigue_sum = calculate_fatigue_sum(trainings_with_tasks, personal_bests)
 
     # Korzystamy z wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb, aby uniknąć 100 procentowego obciążenia
