@@ -5,6 +5,8 @@ from datetime import date
 
 PERSONAL_BESTS = {50: 26.1, 100: 58.5, 200: 128.0, 400: 280.0}
 
+PERSONAL_BESTS_WITHOUT_400_TIME = {50: 26.1, 100: 58.5, 200: 128.0}
+
 PERSONAL_BESTS_HIGHER_200_THAN_400 = {50: 26.1, 100: 58.5, 200: 128.0, 400: 250.0}
 
 def test_pb_speed_exact_distance():
@@ -25,6 +27,10 @@ def test_critical_speed():
 
 def test_critical_speed_faster_400_than_200():
     result = get_critical_speed(PERSONAL_BESTS_HIGHER_200_THAN_400)
+    assert result is None
+
+def test_critical_speed_without_400_time():
+    result = get_critical_speed(PERSONAL_BESTS_WITHOUT_400_TIME)
     assert result is None
 
 SEGMENT = TaskSegmentsCreate(position=1, description="text", distance=100, average_time=68)

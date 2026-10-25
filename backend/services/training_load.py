@@ -50,9 +50,12 @@ def get_segment_speed(segment):
     return speed
 
 def get_critical_speed(personal_bests):
-    personal_best_400 = personal_bests[400]
+    personal_best_400 = personal_bests.get(400)
 
-    personal_best_200 = personal_bests[200]
+    personal_best_200 = personal_bests.get(200)
+
+    if personal_best_400 is None or personal_best_200 is None:
+        return None
 
     if personal_best_400 <= 2 * personal_best_200:
         return None
@@ -107,7 +110,7 @@ def task_density(task):
     return work / (work + breaks)
 
 def task_load(task, critical_speed, personal_bests):
-    # Zadanie bez czasów nie daje obciążenia wewnętrznego
+    # Zadanie bez czasów nie daje obciążenia zewnętrznego
     d = task_density(task)
 
     if d is None:
@@ -211,22 +214,22 @@ def calculate_decay_weight(days_ago):
     return decay_weight
 
 # Ta funkcja podsumuje nam ważone obciążenie wszystkich treningów
-def calculate_fatigue_sum(trainings_with_tasks):
+def calculate_fatigue_sum(trainings_with_tasks, personal_bests):
     fatigue_sum = 0
 
     for training_dict in trainings_with_tasks:
         training_obj = Training(**training_dict)
-        training_load = calculate_training_load(training_obj)
+        load = training_load(training_obj, personal_bests)
         days_ago = (datetime.date.today() - training_obj.date).days
         decay_weight = calculate_decay_weight(days_ago)
-        training_fatigue = training_load * decay_weight
+        training_fatigue = load * decay_weight
         fatigue_sum += training_fatigue
 
     return fatigue_sum
 
-def calculate_percentage_fatigue(trainings_with_tasks):
+def calculate_percentage_fatigue(trainings_with_tasks, personal_bests):
     maximum_value = 6000
-    fatigue_sum = calculate_fatigue_sum(trainings_with_tasks)
+    fatigue_sum = calculate_fatigue_sum(trainings_with_tasks, personal_bests)
 
     # Korzystamy z wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb, aby uniknąć 100 procentowego obciążenia
     percentage_fatigue = min(100, (fatigue_sum / maximum_value) * 100)
