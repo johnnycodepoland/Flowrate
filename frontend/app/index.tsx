@@ -9,6 +9,7 @@ import {API_URL} from "../config";
 
 export default function Index() {
     const today = new Date().toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
+    const [day, month] = today.split(" ");
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -83,7 +84,8 @@ export default function Index() {
                 </View>
             </View>
             <View style={styles.dateBox}>
-                <Text style={styles.dateText}>{today}</Text>
+                <Text style={styles.dateText}>{day}</Text>
+                <Text style={styles.monthText}>{month}</Text>
                 <View style={{flexDirection: "row", alignItems: "center", gap: 4}}>
                     <Ionicons name={weather !== null ? weatherIconMap[weather.condition] : "sunny"} size={16} color="#1A1A1A" />
                     <Text style={styles.weatherText}>{weather !== null ? `${Math.round(weather.temperature)}°C` : "..."}</Text>
@@ -153,7 +155,7 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start"},
     dateText: {
         color: "#1A1A1A",
-        fontSize: 30,
+        fontSize: 48,
         fontFamily: "Montserrat_700Bold"},
     weatherText: {
         color: "#1A1A1A",
@@ -236,5 +238,10 @@ const styles = StyleSheet.create({
         borderRadius:20,
         padding: 16,
         gap: 8,
-        marginTop: 16}
+        marginTop: 16},
+    monthText: {
+        fontFamily: "Inter_700Bold",
+        textTransform: "uppercase",
+        letterSpacing: 1,
+        fontSize: 13.5}  
 })
