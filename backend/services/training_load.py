@@ -11,6 +11,10 @@ DENSITY_WEIGHT = 15
 # Wykładnik gęstości
 DENSITY_EXPONENT = 5
 
+EXTERNAL_LOAD_MAXIMUM = 25000
+
+INTERNAL_LOAD_MAXIMUM = 5000
+
 def get_pb_speed(distance, personal_bests):
     distances = sorted(personal_bests)
 
@@ -178,12 +182,30 @@ def calculate_fatigue_sum(trainings_with_tasks, personal_bests):
 
     return fatigue_sum
 
+def calculate_rpe_sum(trainings_with_tasks):
+    rpe_sum = 0
+
+    for training_dict in trainings_with_tasks:
+        training_obj = Training(**training_dict)
+        load = session_rpe(training_obj)
+        days_ago = (datetime.date.today() - training_obj.date).days
+        decay_weight = calculate_decay_weight(days_ago)
+        training_fatigue = load * decay_weight
+        rpe_sum += training_fatigue
+
+    return rpe_sum
+
 def calculate_percentage_fatigue(trainings_with_tasks, personal_bests):
-    maximum_value = 25000
     fatigue_sum = calculate_fatigue_sum(trainings_with_tasks, personal_bests)
 
-    # Korzystamy z wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb, aby uniknąć 100 procentowego obciążenia
-    percentage_fatigue = min(100, (fatigue_sum / maximum_value) * 100)
+    rpe_sum = calculate_rpe_sum(trainings_with_tasks)
 
-    return percentage_fatigue
+    # Korzystamy z wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb, aby uniknąć 100 procentowego obciążenia
+    external_percentage_fatigue = min(100, (fatigue_sum / EXTERNAL_LOAD_MAXIMUM) * 100)
+
+    internal_percentage_fatigue = min(100, (rpe_sum / INTERNAL_LOAD_MAXIMUM) * 100)
+
+    average_percentage_fatigue = (external_percentage_fatigue + internal_percentage_fatigue) / 2
+
+    return average_percentage_fatigue, external_percentage_fatigue, internal_percentage_fatigue
 
