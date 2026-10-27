@@ -88,6 +88,9 @@ export default function Index() {
                     <Ionicons name={weather !== null ? weatherIconMap[weather.condition] : "sunny"} size={16} color="#1A1A1A" />
                     <Text style={styles.weatherText}>{weather !== null ? `${Math.round(weather.temperature)}°C` : "..."}</Text>
                 </View>
+                <Pressable style={{marginTop: 12}} onPress={() => router.push("/personal-bests")}>
+                    <Ionicons name="person-circle-outline" size={32} color="#1A1A1A" />
+                </Pressable>
             </View>
         </View>
         <View style={styles.sectionHeader}>
