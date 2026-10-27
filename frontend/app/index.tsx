@@ -76,6 +76,9 @@ export default function Index() {
             source={require("../assets/images/high-resolution-color-logo(1).png")}
             style={styles.logo}
         />
+        <Pressable style={styles.profileButton} onPress={() => router.push("/personal-bests")}>
+            <Ionicons name="person-circle-outline" size={32} color="#1A1A1A" />
+        </Pressable>
         <View style={styles.topRow}>
             <View style={styles.percentageCircleContainer}>
                 <View style={styles.percentageCircle}>
@@ -86,13 +89,10 @@ export default function Index() {
             <View style={styles.dateBox}>
                 <Text style={styles.dateText}>{day}</Text>
                 <Text style={styles.monthText}>{month}</Text>
-                <View style={{flexDirection: "row", alignItems: "center", gap: 4}}>
+                <View style={{flexDirection: "row", alignItems: "center", gap: 4, marginTop: 8}}>
                     <Ionicons name={weather !== null ? weatherIconMap[weather.condition] : "sunny"} size={16} color="#1A1A1A" />
                     <Text style={styles.weatherText}>{weather !== null ? `${Math.round(weather.temperature)}°C` : "..."}</Text>
                 </View>
-                <Pressable style={{marginTop: 12}} onPress={() => router.push("/personal-bests")}>
-                    <Ionicons name="person-circle-outline" size={32} color="#1A1A1A" />
-                </Pressable>
             </View>
         </View>
         <View style={styles.sectionHeader}>
@@ -243,5 +243,10 @@ const styles = StyleSheet.create({
         fontFamily: "Inter_700Bold",
         textTransform: "uppercase",
         letterSpacing: 1,
-        fontSize: 13.5}  
+        fontSize: 13.5,
+        color: "#1A1A1A"},
+    profileButton: {
+        position: "absolute",
+        top: 71,
+        right: 0}
 })
