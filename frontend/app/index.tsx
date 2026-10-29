@@ -104,6 +104,12 @@ export default function Index() {
                 </View>
             </View>
         </View>
+        {missingPersonalBests && (
+            <Pressable style={styles.missingCard} onPress={() => router.push("/personal-bests")}>
+                <Text style={styles.missingCardText}>Uzupełnij rekordy na 200 i 400m, żeby zacząć liczyć obciążenie</Text>
+                <Ionicons name={"chevron-forward"} size={20} color="#6366F1" />
+            </Pressable>        
+        )}
         <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Ostatnie treningi</Text>
             <Pressable style={styles.plusButton} onPress={() => router.push("/add-training")}>
@@ -139,13 +145,13 @@ const styles = StyleSheet.create({
         height: 144,
         resizeMode: "contain",
         marginTop: 15,
-        marginBottom: -100,
+        marginBottom: -70,
         alignSelf: "center"},
     percentageCircleContainer: {
         width: "50%",
         justifyContent: "center",
         alignItems: "center",
-        height: 300},
+        marginVertical: 24},
     percentageCircle: {
         width: 140,
         height: 140,
@@ -180,7 +186,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginTop: -50},
+        marginTop: 16},
     sectionTitle: {
         fontSize: 22,
         color: "#1A1A1A",
@@ -257,5 +263,19 @@ const styles = StyleSheet.create({
     profileButton: {
         position: "absolute",
         top: 71,
-        right: 0}
+        right: 0},
+    missingCard: {
+        backgroundColor: "#F5F5F7",
+        borderRadius: 16,
+        padding: 16,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 12,
+        marginBottom: 16},
+    missingCardText: {
+        flex: 1,
+        color: "#1A1A1A",
+        fontSize: 14,
+        fontFamily: "Montserrat_700Bold"
+    }
 })
