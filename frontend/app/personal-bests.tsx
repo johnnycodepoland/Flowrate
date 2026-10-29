@@ -36,8 +36,17 @@ export default function PersonalBests() {
                 return;
             }
         }
-        router.back()
+        goBack()
     };
+
+    const goBack = () => {
+        if (router.canGoBack()) {
+            router.back()
+        }
+        else {
+            router.replace("/")
+        }
+    }
     
     useEffect(() => {
         fetch(`${API_URL}/personal-bests`)
