@@ -20,6 +20,7 @@ export default function Index() {
     const [trainings, setTrainings] = useState([]);
     const [fatigue, setFatigue] = useState(null);
     const [weather, setWeather] = useState(null);
+    const [missingPersonalBests, setMissingPersonalBests] = useState(false);
     const weatherIconMap = {
         clear: "sunny",
         partly_cloudy: "partly-sunny",
@@ -37,6 +38,14 @@ export default function Index() {
             fetch(`${API_URL}/fatigue`)
                 .then(response => response.json())
                 .then(data => setFatigue(data.percentage_fatigue));
+        }, [])
+    );
+
+    useFocusEffect(
+        useCallback(() => {
+            fetch(`${API_URL}/personal-bests`)
+                .then(response => response.json())
+                .then(data => setMissingPersonalBests(!data[200] || !data[400]));
         }, [])
     );
 
