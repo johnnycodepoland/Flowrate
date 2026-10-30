@@ -117,7 +117,7 @@ export default function Index() {
             </Pressable>
         </View>
         <View style={styles.activityCard}>
-            {trainings.slice(0, 6).map((training, index) => (
+            {trainings.length === 0 ? ( <Text style={styles.emptyText}>Brak treningów. Dodaj pierwszy przyciskiem +</Text> ) : trainings.slice(0, 6).map((training, index) => (
                 <Pressable key={training.id} style={styles.activityRow} onPress={() => router.push(`/training/${training.id}`)}>
                     <View style={styles.iconBadge}>
                         <MaterialCommunityIcons name="swim" size={28} color="#FFFFFF"/>
@@ -277,5 +277,10 @@ const styles = StyleSheet.create({
         color: "#1A1A1A",
         fontSize: 14,
         fontFamily: "Montserrat_700Bold"
-    }
+    },
+    emptyText: {
+        color: "#6B7280",
+        textAlign: "center",
+        fontSize: 14,
+        fontFamily: "Montserrat_400Regular"}
 })
