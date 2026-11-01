@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from backend.repositories.user_repository import user_repository
-from backend.models.user import UserCreate
-from backend.services.auth import hash_password
+from backend.models.user import UserCreate, UserLogin
+from backend.services.auth import hash_password, verify_password, create_access_token
 
 router = APIRouter()
 
@@ -19,3 +19,16 @@ def register(user_create: UserCreate):
     user_id = user_repository.create_user(email, password_hash)
 
     return {"id": user_id, "email": email}
+
+@router.post("/auth/login")
+def login(user_login: UserLogin):
+    email = user_login.email.lower().strip()
+
+    user_in_database = user_repository.get_user_by_email(email)
+
+    if user_in_database is None or not verify_password(user_login.password, user_in_database["password_hash"]):
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
+
+    return {"access_token": create_access_token(user_in_database["id"]), "token_type": "bearer"}
+
+    

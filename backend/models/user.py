@@ -5,3 +5,7 @@ MIN_PASSWORD_LENGTH=8
 class UserCreate(BaseModel):
     email: str
     password: str = Field(min_length=MIN_PASSWORD_LENGTH)
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
