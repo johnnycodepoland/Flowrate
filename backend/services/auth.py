@@ -2,17 +2,22 @@ import bcrypt
 import os
 import jwt
 from datetime import datetime, timedelta, timezone
+from fastapi import HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-# Zapisujemy pod tą zmienną secret_key który można domyślnie znaleźć u każdego użytkownika
+# Tworzymy odczytwać na poziomie modułu który sprawdzi token w żądaniu api
+bearer_scheme = HTTPBearer()
+
+# Tajny klucz do podpisywania tokenów ze zmiennej środowiskowej, jest tworzony dla całego serwera
 SECRET_KEY = os.environ["FLOWRATE_SECRET_KEY"]
 
-# Zapisujemy kod formatu hashowania hasła
+# Algorytm podpisu tokena
 ALGORITHM = "HS256"
 
 ACCESS_TOKEN_EXPIRE_DAYS = 30
 
 def hash_password(password):
-    # Zamieniamy hasło na bity
+    # Zamieniamy hasło na bajty
     password_bytes = password.encode("utf-8")
 
     # Generujemy losową sól dla hasła jako gotowe zabezpieczenie
@@ -36,4 +41,22 @@ def create_access_token(user_id):
     data = {"sub": str(user_id), "exp": datetime.now(timezone.utc) + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)}
 
     return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+
+def decode_access_token(token):
+    try:
+        # Dekodujemy token 
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return int(payload["sub"])
+
+    except jwt.InvalidTokenError:
+        # Dodajemy infromacje o typie logwania oczekiwanego przez serwer
+        raise HTTPException(status_code=401, detail="Invalid or expired token", headers={"WWW-Authenticate": "Bearer"})
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+    token = credentials.credentials
+
+    return decode_access_token(token)
+
+
+
 
