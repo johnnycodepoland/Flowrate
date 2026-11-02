@@ -35,7 +35,7 @@ class Database:
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS training_tasks (
                 id INTEGER PRIMARY KEY,
-                training_id INTEGER,
+                training_id INTEGER REFERENCES trainings(id),
                 description TEXT,
                 task_reps INTEGER,
                 task_break INTEGER)
