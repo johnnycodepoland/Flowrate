@@ -32,4 +32,16 @@ class UserRepository:
 
         return cursor.lastrowid
 
+    def get_user_by_id(self, user_id):
+        cursor = self.database.get_cursor()
+
+        cursor.execute(
+            """SELECT * FROM users WHERE id =?""",
+            (user_id,)
+        )
+
+        user = cursor.fetchone()
+
+        return user
+
 user_repository = UserRepository(database)
