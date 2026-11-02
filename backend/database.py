@@ -28,7 +28,8 @@ class Database:
                 date TEXT,
                 time INTEGER,
                 distance INTEGER,
-                RPE INTEGER)
+                RPE INTEGER,
+                user_id INTEGER REFERENCES users(id))
                 """)
 
         self.cursor.execute("""
@@ -55,8 +56,10 @@ class Database:
         
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS personal_bests (
-                distance INTEGER PRIMARY KEY,
-                time REAL)
+                user_id INTEGER REFERENCES users(id),
+                distance INTEGER,
+                time REAL,
+                PRIMARY KEY (user_id, distance))
                 """)
 
         self.cursor.execute("""
