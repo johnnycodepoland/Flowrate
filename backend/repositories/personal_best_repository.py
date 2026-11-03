@@ -8,11 +8,12 @@ class PersonalBestRepository:
 
         self.database = database
 
-    def get_all_personal_bests(self):
+    def get_all_personal_bests(self, user_id):
         cursor = self.database.get_cursor()
 
         cursor.execute(
-            """SELECT distance, time from personal_bests"""
+            """SELECT distance, time from personal_bests WHERE user_id = ?""",
+            (user_id,)
         )
 
         personal_bests = cursor.fetchall()
@@ -21,12 +22,12 @@ class PersonalBestRepository:
 
         return personal_bests
 
-    def upsert_personal_best(self, personal_best):
+    def upsert_personal_best(self, personal_best, user_id):
         cursor = self.database.get_cursor()
 
         cursor.execute(
-            """INSERT OR REPLACE into personal_bests (distance, time) VALUES (?, ?)""",
-            (personal_best.distance, personal_best.time)
+            """INSERT OR REPLACE into personal_bests (user_id, distance, time) VALUES (?, ?, ?)""",
+            (user_id, personal_best.distance, personal_best.time)
         )
 
         self.connection.commit()
