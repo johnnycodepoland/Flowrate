@@ -61,9 +61,9 @@ export default function PersonalBests() {
         });
     }, []);
 
-    if (!fontLoaded) {
-        return null;
-    }
+if (!fontLoaded) {
+    return null;
+}
 
     return (
         <View style={styles.container}>
