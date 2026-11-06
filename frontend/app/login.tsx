@@ -46,9 +46,10 @@ export default function Login() {
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
             <Image
-                source={require("../assets/images/high-resolution-color-logo(1).png")}
+                source={require("../assets/images/logo.png")}
                 style={styles.logo}
-            />
+                resizeMode="contain"
+            />  
             <Text style={styles.loginText}>Zaloguj się</Text>
             <Text style={styles.label}>E-mail</Text>
             <TextInput
@@ -60,6 +61,7 @@ export default function Login() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 textContentType="emailAddress"
+                placeholderTextColor="#9CA3AF"
             />
             <Text style={styles.label}>Hasło</Text>
             <TextInput
@@ -69,9 +71,15 @@ export default function Login() {
                 onChangeText={setPassword}
                 secureTextEntry={true}
                 textContentType="password"
+                placeholderTextColor="#9CA3AF"
             />
             <Pressable style={styles.nextButton} onPress={handleLogin}>
                 <Text style={styles.nextButtonText}>Zaloguj</Text>
+            </Pressable>
+            <Pressable onPress={() => router.push("/register")}>
+                <Text style={styles.switchText}>
+                    Nie masz konta? <Text style={styles.switchLink}>Zarejestruj się</Text>
+                </Text>
             </Pressable>
         </ScrollView>
     )
@@ -83,11 +91,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         backgroundColor: "#FFFFFF"},
     logo: {
-        width: "100%",
-        height: 50,
-        resizeMode: "contain",
-        marginTop: 15,
-        marginBottom: 0,
+        width: 200,
+        height: 38,
+        marginBottom: 24,
         alignSelf: "center"},
     content: {
         flexGrow: 1,
@@ -117,5 +123,13 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: "#FFFFFF",
         fontSize: 18,
+        fontFamily: "Montserrat_700Bold"},
+    switchText: {
+        textAlign: "center",
+        color: "#6B7280",
+        fontSize: 14,
+        fontFamily: "Montserrat_400Regular"},
+    switchLink: {
+        color: "#6366F1",
         fontFamily: "Montserrat_700Bold"}
 })

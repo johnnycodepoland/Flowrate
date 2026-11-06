@@ -67,10 +67,11 @@ export default function Register() {
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-            <Image
-                source={require("../assets/images/high-resolution-color-logo(1).png")}
-                style={styles.logo}
-            />
+             <Image
+                 source={require("../assets/images/logo.png")}
+                 style={styles.logo}
+                 resizeMode="contain"
+             />  
             <Text style={styles.loginText}>Załóż konto</Text>
             <Text style={styles.label}>E-mail</Text>
             <TextInput
@@ -82,6 +83,7 @@ export default function Register() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 textContentType="emailAddress"
+                placeholderTextColor="#9CA3AF"
             />
             <Text style={styles.label}>Hasło</Text>
             <TextInput
@@ -91,6 +93,7 @@ export default function Register() {
                 onChangeText={setPassword}
                 secureTextEntry={true}
                 textContentType="password"
+                placeholderTextColor="#9CA3AF"
             />
             <Pressable style={styles.nextButton} onPress={handleRegister}>
                 <Text style={styles.nextButtonText}>Zarejestruj się</Text>
@@ -110,11 +113,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         backgroundColor: "#FFFFFF"},
     logo: {
-        width: "100%",
-        height: 50,
-        resizeMode: "contain",
-        marginTop: 15,
-        marginBottom: 0,
+        width: 200,
+        height: 38,
+        marginBottom: 24,
         alignSelf: "center"},
     content: {
         flexGrow: 1,
