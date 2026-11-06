@@ -9,6 +9,7 @@ import {Swipeable, ScrollView} from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {API_URL} from "../../config";
 import {parseDecimal, hasAnyTime, showError} from "../../utils"
+import {apiFetch} from "../../api";
 
 export default function AddTraining() {
     const {id} = useLocalSearchParams();
@@ -211,7 +212,7 @@ export default function AddTraining() {
             tasks: allTasks,
         };
 
-        fetch(`${API_URL}/trainings/${id}`, {
+        apiFetch(`/trainings/${id}`, {
             method: "PUT",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(newTraining),
@@ -235,7 +236,7 @@ export default function AddTraining() {
     };
 
     useEffect(() => {
-        fetch(`${API_URL}/trainings/${id}`)
+        apiFetch(`/trainings/${id}`)
             .then(response => response.json())
             .then(data => {
                 setManualTime(String(data.time));
