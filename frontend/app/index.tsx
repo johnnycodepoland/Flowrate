@@ -6,6 +6,7 @@ import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useRouter, useFocusEffect} from "expo-router";
 import * as Location from "expo-location";
 import {API_URL} from "../config";
+import {apiFetch} from "../api";
 
 export default function Index() {
     const today = new Date().toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
@@ -35,7 +36,7 @@ export default function Index() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch(`${API_URL}/fatigue`)
+            apiFetch("/fatigue")
                 .then(response => response.json())
                 .then(data => setFatigue(data.percentage_fatigue));
         }, [])
@@ -43,7 +44,7 @@ export default function Index() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch(`${API_URL}/personal-bests`)
+            apiFetch("/personal-bests")
                 .then(response => response.json())
                 .then(data => setMissingPersonalBests(!data[200] || !data[400]));
         }, [])
@@ -51,7 +52,7 @@ export default function Index() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch(`${API_URL}/trainings`)
+            apiFetch("/trainings")
                 .then(response => response.json())
                 .then(data => setTrainings(data));
         }, [])
