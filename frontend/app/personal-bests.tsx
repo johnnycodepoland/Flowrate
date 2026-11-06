@@ -6,6 +6,7 @@ import {router} from "expo-router";
 import {useState, useEffect} from "react"
 import {API_URL} from "../config";
 import {parseTime, formatTime, showError} from "../utils";
+import {apiFetch} from "../api";
 
 export default function PersonalBests() {
     const [times, setTimes] = useState({50: "", 100: "", 200: "", 400: ""});
@@ -26,7 +27,7 @@ export default function PersonalBests() {
                 return;
             }
 
-            const res = await fetch(`${API_URL}/personal-bests`, {
+            const res = await apiFetch("/personal-bests", {
                 method: "PUT",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({distance: distance, time: time}),
@@ -49,7 +50,7 @@ export default function PersonalBests() {
     }
     
     useEffect(() => {
-        fetch(`${API_URL}/personal-bests`)
+        apiFetch("/personal-bests")
             .then(response => response.json())
             .then(data => {
             setTimes({

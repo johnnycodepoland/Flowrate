@@ -5,6 +5,7 @@ import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useRouter, useFocusEffect} from "expo-router";
 import {API_URL} from "../config";
+import {apiFetch} from "../api";
 
 export default function AllTrainings() {
     const [fontLoaded] = useFonts({
@@ -18,7 +19,7 @@ export default function AllTrainings() {
 
     useFocusEffect(
         useCallback(() => {
-            fetch(`${API_URL}/trainings`)
+            apiFetch("/trainings")
                 .then(response => response.json())
                 .then(data => setTrainings(data));
         }, [])
