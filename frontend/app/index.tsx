@@ -37,24 +37,24 @@ export default function Index() {
     useFocusEffect(
         useCallback(() => {
             apiFetch("/fatigue")
-                .then(response => response.json())
-                .then(data => setFatigue(data.percentage_fatigue));
+                .then(response => response.ok ? response.json() : null)
+                .then(data => {if (data) setFatigue(data.percentage_fatigue)});
         }, [])
     );
 
     useFocusEffect(
         useCallback(() => {
             apiFetch("/personal-bests")
-                .then(response => response.json())
-                .then(data => setMissingPersonalBests(!data[200] || !data[400]));
+                .then(response => response.ok ? response.json() : null)
+                .then(data => {if (data) setMissingPersonalBests(!data[200] || !data[400]) });
         }, [])
     );
 
     useFocusEffect(
         useCallback(() => {
             apiFetch("/trainings")
-                .then(response => response.json())
-                .then(data => setTrainings(data));
+                .then(response => response.ok ? response.json() : null)
+                .then(data => { if (data) setTrainings(data) })
         }, [])
     );
 

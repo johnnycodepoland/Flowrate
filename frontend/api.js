@@ -1,5 +1,6 @@
 import {API_URL} from "./config";
 import {getToken, deleteToken} from "./auth"
+import {router} from "expo-router"
 
 export const apiFetch = async (path, options = {}) => {
     const token = await getToken();
@@ -14,6 +15,7 @@ export const apiFetch = async (path, options = {}) => {
 
     if (res.status === 401) {
         await deleteToken();
+        router.replace("/login")
     }
     return res;
 };

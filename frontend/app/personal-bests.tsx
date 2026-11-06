@@ -7,6 +7,7 @@ import {useState, useEffect} from "react"
 import {API_URL} from "../config";
 import {parseTime, formatTime, showError} from "../utils";
 import {apiFetch} from "../api";
+import {deleteToken} from "../auth";
 
 export default function PersonalBests() {
     const [times, setTimes] = useState({50: "", 100: "", 200: "", 400: ""});
@@ -38,6 +39,11 @@ export default function PersonalBests() {
             }
         }
         goBack()
+    };
+
+    const handleLogout = async () => {
+        await deleteToken();
+        router.replace("/login")
     };
 
     const goBack = () => {
@@ -109,6 +115,9 @@ if (!fontLoaded) {
             <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleSave}>
                 <Text style={styles.nextButtonText}>Zatwierdź</Text>
             </Pressable>
+            <Pressable style={[styles.logoutButton, {marginTop: 12}]} onPress={handleLogout}>
+                <Text style={styles.logoutButtonText}>Wyloguj się</Text>
+            </Pressable>
         </View>
     )
 }
@@ -154,5 +163,13 @@ const styles = StyleSheet.create({
     nextButtonText: {
         color: "#FFFFFF",
         fontSize: 18,
-        fontFamily: "Montserrat_700Bold"}
+        fontFamily: "Montserrat_700Bold"},
+    logoutButton: {
+        color: "#EF4444",
+        alignItems: "center",
+        paddingVertical: 14},
+    logoutButtonText: {
+        fontFamily: "Montserrat_700Bold",
+        fontSize: 18,
+        color: "#EF4444"}
 })
