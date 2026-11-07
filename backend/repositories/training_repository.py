@@ -10,13 +10,13 @@ class TrainingRepository:
 
         self.database = database
 
-    def create_training(self, training):
+    def create_training(self, training, user_id):
         cursor = self.database.get_cursor()
 
         try:
             cursor.execute(
-                """INSERT INTO trainings (date, time, distance, RPE) VALUES (?, ?, ?, ?)""",
-                (training.date, training.time, training.distance, training.RPE)
+                """INSERT INTO trainings (user_id, date, time, distance, RPE) VALUES (?, ?, ?, ?, ?)""",
+                (user_id, training.date, training.time, training.distance, training.RPE)
             )
 
             # self.cursor.lastrowid zwraca id ostatnio wstawionego wiersza
@@ -50,21 +50,25 @@ class TrainingRepository:
 
         return new_training_id
 
-    def get_all_trainings(self):
+    def get_all_trainings(self, user_id):
         cursor = self.database.get_cursor()
 
         cursor.execute(
-            """SELECT * from trainings order by date desc"""
+            """SELECT * from trainings where user_id = ? order by date desc""",
+            (user_id,)
         )
 
         trainings = cursor.fetchall()
 
         return trainings
 
-    def get_training_by_id(self, training_id):
+    def get_training_by_id(self, training_id, user_id):
         cursor = self.database.get_cursor()
 
-        training = cursor.execute("""SELECT * from trainings where id = ?""", (training_id,)).fetchone()
+        training = cursor.execute("""SELECT * from trainings where id = ? and user_id = ?""", (training_id, user_id)).fetchone()
+
+        if training is None: 
+            return None, [], []
 
         tasks = cursor.execute("""SELECT * from training_tasks where training_id = ?""", (training_id,)).fetchall()
 
@@ -152,11 +156,12 @@ class TrainingRepository:
 
         self.connection.commit()
 
-    def get_all_trainings_with_tasks(self):
+    def get_all_trainings_with_tasks(self, user_id):
         cursor = self.database.get_cursor()
 
         cursor.execute(
-            """SELECT * from trainings"""
+            """SELECT * from trainings where user_id = ?""",
+            (user_id,)
         )
 
         trainings = cursor.fetchall()

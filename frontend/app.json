@@ -50,7 +50,8 @@
         {
           "locationWhenInUsePermission": "Potrzebujemy Twojej lokalizacji, aby pokazać aktualną pogodę."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

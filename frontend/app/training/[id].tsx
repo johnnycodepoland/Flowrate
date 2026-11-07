@@ -5,9 +5,8 @@ import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {useRouter} from "expo-router";
-import {Liquid} from 'liquid-gooey';
-import {API_URL} from "../../config";
 import {hasAnyTime} from "../../utils"
+import {apiFetch} from "../../api";
 
 export default function TrainingDetails() {
     const {id} = useLocalSearchParams();
@@ -16,9 +15,9 @@ export default function TrainingDetails() {
     const [expandedIndex, setExpandedIndex] = useState(null);
 
     useEffect (() => {
-        fetch(`${API_URL}/trainings/${id}`)
-            .then(response => response.json())
-            .then(data => setTraining(data));
+        apiFetch(`/trainings/${id}`)
+            .then(response => response.ok ? response.json() : null)
+            .then(data => {if (data) setTraining(data) });
     }, []);
 
     const getRepDistance = (task) => {
@@ -58,7 +57,7 @@ export default function TrainingDetails() {
             "Co chcesz zrobić?",
             [
                 { text: "Edytuj", onPress: () => router.push(`/edit-training/${id}`) },
-                { text: "Usuń", onPress: handleDelete, style: "desctructive"},
+                { text: "Usuń", onPress: handleDelete, style: "destructive"},
                 { text: "Anuluj", style: "cancel"},
             ]
         );
@@ -75,7 +74,7 @@ export default function TrainingDetails() {
     const formattedDate = new Date(training.date).toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
 
     const handleDelete = () => {
-        fetch(`${API_URL}/trainings/${id}`, {
+        apiFetch(`/trainings/${id}`, {
             method: "DELETE"
         })
             .then(() => router.back());
