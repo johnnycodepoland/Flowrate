@@ -10,6 +10,7 @@ import {saveToken} from "../auth"
 export default function Register() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false)
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -18,47 +19,55 @@ export default function Register() {
     });
 
     const handleRegister = async () => {
-        if (email === "" || password === "") {
-            showError("Wpisz e-mail i hasło")
+        if (loading) {
             return;
         }
+        setLoading(true)
+        
+        try {
+            if (email === "" || password === "") {
+                showError("Wpisz e-mail i hasło")
+                return;
+            }
 
-        if (password.length < 8) {
-            showError("Hasło musi mieć minimum 8 znaków")
-            return;
+            if (password.length < 8) {
+                showError("Hasło musi mieć minimum 8 znaków")
+                return;
+            }
+
+            const res = await fetch(`${API_URL}/auth/register`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email, password}),
+            })
+
+            if (res.status === 409) {
+                showError("Konto z tym adresem e-mail już istnieje");
+                return;
+            }
+
+            if (!res.ok) {
+                showError("Nie udało się utworzyć konta");
+                return;
+            }
+
+            const res2 = await fetch(`${API_URL}/auth/login`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email, password}),
+            })
+
+            if (!res2.ok) {
+                showError("Konto utworzone, zaloguj się")
+                router.replace("/login")
+                return;
+            }
+
+            const data = await res2.json()
+            await saveToken(data.access_token)
+            router.replace("/")
         }
-
-    const res = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({email, password}),
-    })
-
-    if (res.status === 409) {
-        showError("Konto z tym adresem e-mail już istnieje");
-        return;
-    }
-
-    if (!res.ok) {
-        showError("Nie udało się utworzyć konta");
-        return;
-    }
-
-    const res2 = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({email, password}),
-    })
-
-    if (!res2.ok) {
-        showError("Konto utworzone, zaloguj się")
-        router.replace("/login")
-        return;
-    }
-
-    const data = await res2.json()
-    await saveToken(data.access_token)
-    router.replace("/")
+        finally { setLoading(false) }
     };
 
     if (!fontLoaded) {
@@ -95,8 +104,8 @@ export default function Register() {
                 textContentType="password"
                 placeholderTextColor="#9CA3AF"
             />
-            <Pressable style={styles.nextButton} onPress={handleRegister}>
-                <Text style={styles.nextButtonText}>Zarejestruj się</Text>
+            <Pressable style={styles.nextButton} onPress={handleRegister} disabled={loading}>
+                <Text style={styles.nextButtonText}>{loading ? "Tworzenie konta..." : "Zarejestruj się"}</Text>
             </Pressable>
             <Pressable onPress={() => router.back()}>
                 <Text style={styles.switchText}>

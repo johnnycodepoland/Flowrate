@@ -10,6 +10,7 @@ import {saveToken} from "../auth"
 export default function Login() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false)
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -18,25 +19,33 @@ export default function Login() {
     });
 
     const handleLogin = async () => {
-        if (email === "" || password === "") {
-            showError("Wpisz e-mail i hasło")
+        if (loading) {
             return;
         }
+        setLoading(true)
 
-    const res = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({email, password}),
-    })
+        try {
+            if (email === "" || password === "") {
+                showError("Wpisz e-mail i hasło")
+                return;
+            }
 
-    if (!res.ok) {
-        showError("Nieprawidłowy e-mail lub hasło")
-        return;
-    }
+            const res = await fetch(`${API_URL}/auth/login`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email, password}),
+            })
 
-    const data = await res.json()
-    await saveToken(data.access_token)
-    router.replace("/")
+            if (!res.ok) {
+                showError("Nieprawidłowy e-mail lub hasło")
+                return;
+            }
+
+            const data = await res.json()
+            await saveToken(data.access_token)
+            router.replace("/")
+        }
+        finally {setLoading(false)}
     };
 
     if (!fontLoaded) {
@@ -73,8 +82,8 @@ export default function Login() {
                 textContentType="password"
                 placeholderTextColor="#9CA3AF"
             />
-            <Pressable style={styles.nextButton} onPress={handleLogin}>
-                <Text style={styles.nextButtonText}>Zaloguj</Text>
+            <Pressable style={styles.nextButton} onPress={handleLogin} disabled={loading}>
+                <Text style={styles.nextButtonText}>{loading ? "Logowanie..." : "Zaloguj się"}</Text>
             </Pressable>
             <Pressable onPress={() => router.push("/register")}>
                 <Text style={styles.switchText}>
