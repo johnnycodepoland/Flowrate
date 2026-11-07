@@ -31,7 +31,8 @@ export default function AddTraining() {
     const [manualTime, setManualTime] = useState("")
     const [timeMode, setTimeMode] = useState("average");
     const [timeInput, setTimeInput] = useState("");
-    const [hasTime, setHasTime] = useState(true);               
+    const [hasTime, setHasTime] = useState(true);        
+    const [loading, setLoading] = useState(false);
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -182,6 +183,8 @@ export default function AddTraining() {
     }
 
     const handleSave = () => {
+        if (loading) return;
+
         let allTasks = tasks;
 
         if (taskDescription.trim() !== "" && currentSegments.length > 0) {
@@ -217,6 +220,8 @@ export default function AddTraining() {
             tasks: allTasks,
         };
 
+        setLoading(true)
+
         apiFetch("/trainings", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -227,8 +232,9 @@ export default function AddTraining() {
                     Alert.alert("Błąd", "Nie udało się zapisać treningu");
                     return;
                 }
-                router.push("/")
-            });
+                router.back()
+            })
+            .finally(() => setLoading(false));
     };
 
     if (!fontLoaded) {
@@ -389,8 +395,8 @@ export default function AddTraining() {
                                 <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={handleAddTask}>
                                     <Text style={styles.nextButtonText}>Dodaj kolejne zadanie</Text>
                                 </Pressable>
-                                <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={handleSave}>
-                                    <Text style={styles.nextButtonText}>Zakończ i zapisz trening</Text>
+                                <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={handleSave} disabled={loading}>
+                                    <Text style={styles.nextButtonText}>{loading ? "Zapisywanie..." : "Zapisz trening"}</Text>
                                 </Pressable>
                             </View>
                             <Modal
