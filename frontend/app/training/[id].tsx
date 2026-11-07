@@ -1,6 +1,6 @@
 import {Pressable, StyleSheet, ScrollView, Text, View, Alert} from "react-native";
-import {useState, useEffect} from "react"
-import {useLocalSearchParams} from "expo-router";
+import {useState, useEffect, useCallback} from "react"
+import {useFocusEffect, useLocalSearchParams} from "expo-router";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
@@ -14,11 +14,13 @@ export default function TrainingDetails() {
     const [training, setTraining] = useState(null);
     const [expandedIndex, setExpandedIndex] = useState(null);
 
-    useEffect (() => {
-        apiFetch(`/trainings/${id}`)
-            .then(response => response.ok ? response.json() : null)
-            .then(data => {if (data) setTraining(data) });
-    }, []);
+    useFocusEffect (
+        useCallback(() => {
+            apiFetch(`/trainings/${id}`)
+                .then(response => response.ok ? response.json() : null)
+                .then(data => {if (data) setTraining(data) });
+        }, [id])
+    );
 
     const getRepDistance = (task) => {
         let repDistance = 0;
