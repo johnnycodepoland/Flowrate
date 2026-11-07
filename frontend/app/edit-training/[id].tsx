@@ -7,7 +7,6 @@ import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Swipeable, ScrollView} from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import {API_URL} from "../../config";
 import {parseDecimal, hasAnyTime, showError} from "../../utils"
 import {apiFetch} from "../../api";
 
@@ -219,10 +218,10 @@ export default function AddTraining() {
         })
             .then((res) => {
                 if (!res.ok) {
-                    Alert.alert("Błąd", "Nie udało się zapisać zmian");
+                    showError("Błąd", "Nie udało się zapisać zmian");
                     return;
                 }
-                router.push("/")
+                router.back()
             });
     };
 
@@ -237,8 +236,9 @@ export default function AddTraining() {
 
     useEffect(() => {
         apiFetch(`/trainings/${id}`)
-            .then(response => response.json())
+            .then(response => response.ok ? response.json() : null)
             .then(data => {
+                if (!data) return;
                 setManualTime(String(data.time));
                 setRpe(data.RPE);
                 setDate(new Date(data.date));

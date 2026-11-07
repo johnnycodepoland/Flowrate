@@ -5,8 +5,6 @@ import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {useRouter} from "expo-router";
-import {Liquid} from 'liquid-gooey';
-import {API_URL} from "../../config";
 import {hasAnyTime} from "../../utils"
 import {apiFetch} from "../../api";
 
@@ -18,8 +16,8 @@ export default function TrainingDetails() {
 
     useEffect (() => {
         apiFetch(`/trainings/${id}`)
-            .then(response => response.json())
-            .then(data => setTraining(data));
+            .then(response => response.ok ? response.json() : null)
+            .then(data => {if (data) setTraining(data) });
     }, []);
 
     const getRepDistance = (task) => {

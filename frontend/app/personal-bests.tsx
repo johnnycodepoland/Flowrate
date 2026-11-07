@@ -4,7 +4,6 @@ import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Ionicons} from "@expo/vector-icons";
 import {router} from "expo-router";
 import {useState, useEffect} from "react"
-import {API_URL} from "../config";
 import {parseTime, formatTime, showError} from "../utils";
 import {apiFetch} from "../api";
 import {deleteToken} from "../auth";
@@ -57,8 +56,9 @@ export default function PersonalBests() {
     
     useEffect(() => {
         apiFetch("/personal-bests")
-            .then(response => response.json())
+            .then(response => response.ok ? response.json() : null)
             .then(data => {
+            if (!data) return;
             setTimes({
                 50: data[50] ? formatTime(data[50]) : "",
                 100: data[100] ? formatTime(data[100]) : "",

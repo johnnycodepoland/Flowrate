@@ -7,7 +7,6 @@ import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {Swipeable, ScrollView} from "react-native-gesture-handler";
-import {API_URL} from "../config";
 import {parseDecimal, showError, hasAnyTime} from "../utils";
 import {apiFetch} from "../api";
 
