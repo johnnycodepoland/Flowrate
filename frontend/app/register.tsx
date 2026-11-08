@@ -6,10 +6,13 @@ import {useState} from "react"
 import {API_URL} from "../config";
 import {showError} from "../utils";
 import {saveToken} from "../auth"
+import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function Register() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -18,47 +21,55 @@ export default function Register() {
     });
 
     const handleRegister = async () => {
-        if (email === "" || password === "") {
-            showError("Wpisz e-mail i hasło")
+        if (loading) {
             return;
         }
+        setLoading(true)
+        
+        try {
+            if (email === "" || password === "") {
+                showError("Wpisz e-mail i hasło")
+                return;
+            }
 
-        if (password.length < 8) {
-            showError("Hasło musi mieć minimum 8 znaków")
-            return;
+            if (password.length < 8) {
+                showError("Hasło musi mieć minimum 8 znaków")
+                return;
+            }
+
+            const res = await fetch(`${API_URL}/auth/register`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email, password}),
+            })
+
+            if (res.status === 409) {
+                showError("Konto z tym adresem e-mail już istnieje");
+                return;
+            }
+
+            if (!res.ok) {
+                showError("Nie udało się utworzyć konta");
+                return;
+            }
+
+            const res2 = await fetch(`${API_URL}/auth/login`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email, password}),
+            })
+
+            if (!res2.ok) {
+                showError("Konto utworzone, zaloguj się")
+                router.replace("/login")
+                return;
+            }
+
+            const data = await res2.json()
+            await saveToken(data.access_token)
+            router.replace("/")
         }
-
-    const res = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({email, password}),
-    })
-
-    if (res.status === 409) {
-        showError("Konto z tym adresem e-mail już istnieje");
-        return;
-    }
-
-    if (!res.ok) {
-        showError("Nie udało się utworzyć konta");
-        return;
-    }
-
-    const res2 = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({email, password}),
-    })
-
-    if (!res2.ok) {
-        showError("Konto utworzone, zaloguj się")
-        router.replace("/login")
-        return;
-    }
-
-    const data = await res2.json()
-    await saveToken(data.access_token)
-    router.replace("/")
+        finally { setLoading(false) }
     };
 
     if (!fontLoaded) {
@@ -86,19 +97,26 @@ export default function Register() {
                 placeholderTextColor="#9CA3AF"
             />
             <Text style={styles.label}>Hasło</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Minimum 8 znaków"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={true}
-                textContentType="password"
-                placeholderTextColor="#9CA3AF"
-            />
-            <Pressable style={styles.nextButton} onPress={handleRegister}>
-                <Text style={styles.nextButtonText}>Zarejestruj się</Text>
+            <View style={styles.passwordContainer}>
+                <TextInput
+                    style={[styles.input, {flex: 1}]}
+                    placeholder="Minimum 8 znaków"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    textContentType="password"
+                    placeholderTextColor="#9CA3AF"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                />
+                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                    <MaterialCommunityIcons name={showPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+                </Pressable>
+            </View>
+            <Pressable style={styles.nextButton} onPress={handleRegister} disabled={loading}>
+                <Text style={styles.nextButtonText}>{loading ? "Tworzenie konta..." : "Zarejestruj się"}</Text>
             </Pressable>
-            <Pressable onPress={() => router.back()}>
+            <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace("/login")}>
                 <Text style={styles.switchText}>
                     Masz już konto? <Text style={styles.switchLink}>Zaloguj się</Text>
                 </Text>
@@ -153,5 +171,11 @@ const styles = StyleSheet.create({
         fontFamily: "Montserrat_400Regular"},
     switchLink: {
         color: "#6366F1",
-        fontFamily: "Montserrat_700Bold"}
+        fontFamily: "Montserrat_700Bold"},
+    passwordContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F5F5F7",
+        borderRadius: 12,
+        paddingRight: 14}
 })

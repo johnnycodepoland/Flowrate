@@ -6,10 +6,13 @@ import {useState} from "react"
 import {API_URL} from "../config";
 import {showError} from "../utils";
 import {saveToken} from "../auth"
+import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function Login() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -18,25 +21,33 @@ export default function Login() {
     });
 
     const handleLogin = async () => {
-        if (email === "" || password === "") {
-            showError("Wpisz e-mail i hasło")
+        if (loading) {
             return;
         }
+        setLoading(true)
 
-    const res = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({email, password}),
-    })
+        try {
+            if (email === "" || password === "") {
+                showError("Wpisz e-mail i hasło")
+                return;
+            }
 
-    if (!res.ok) {
-        showError("Nieprawidłowy e-mail lub hasło")
-        return;
-    }
+            const res = await fetch(`${API_URL}/auth/login`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email, password}),
+            })
 
-    const data = await res.json()
-    await saveToken(data.access_token)
-    router.replace("/")
+            if (!res.ok) {
+                showError("Nieprawidłowy e-mail lub hasło")
+                return;
+            }
+
+            const data = await res.json()
+            await saveToken(data.access_token)
+            router.replace("/")
+        }
+        finally {setLoading(false)}
     };
 
     if (!fontLoaded) {
@@ -64,17 +75,24 @@ export default function Login() {
                 placeholderTextColor="#9CA3AF"
             />
             <Text style={styles.label}>Hasło</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Minimum 8 znaków"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={true}
-                textContentType="password"
-                placeholderTextColor="#9CA3AF"
-            />
-            <Pressable style={styles.nextButton} onPress={handleLogin}>
-                <Text style={styles.nextButtonText}>Zaloguj</Text>
+            <View style={styles.passwordContainer}>
+                <TextInput
+                    style={[styles.input, {flex:1}]}
+                    placeholder="Minimum 8 znaków"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    textContentType="password"
+                    placeholderTextColor="#9CA3AF"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                />
+                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                    <MaterialCommunityIcons name={showPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+                </Pressable>
+            </View>
+            <Pressable style={styles.nextButton} onPress={handleLogin} disabled={loading}>
+                <Text style={styles.nextButtonText}>{loading ? "Logowanie..." : "Zaloguj się"}</Text>
             </Pressable>
             <Pressable onPress={() => router.push("/register")}>
                 <Text style={styles.switchText}>
@@ -131,5 +149,11 @@ const styles = StyleSheet.create({
         fontFamily: "Montserrat_400Regular"},
     switchLink: {
         color: "#6366F1",
-        fontFamily: "Montserrat_700Bold"}
+        fontFamily: "Montserrat_700Bold"},
+    passwordContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F5F5F7",
+        borderRadius: 12,
+        paddingRight: 14}
 })

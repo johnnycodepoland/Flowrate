@@ -7,7 +7,7 @@ import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google
 import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Swipeable, ScrollView} from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import {parseDecimal, hasAnyTime, showError} from "../../utils"
+import {parseDecimal, hasAnyTime, showError} from "../../utils";
 import {apiFetch} from "../../api";
 
 export default function AddTraining() {
@@ -34,6 +34,7 @@ export default function AddTraining() {
     const [segmentModalVisible, setSegmentModalVisible] = useState(false);
     const [manualTime, setManualTime] = useState("")
     const [hasTime, setHasTime] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -176,6 +177,8 @@ export default function AddTraining() {
     };
 
     const handleSave = () => {
+        if (loading) return;
+
         let allTasks = tasks;
 
         if (taskDescription.trim() !== "" && currentSegments.length > 0) {
@@ -211,6 +214,8 @@ export default function AddTraining() {
             tasks: allTasks,
         };
 
+        setLoading(true)
+
         apiFetch(`/trainings/${id}`, {
             method: "PUT",
             headers: {"Content-Type": "application/json"},
@@ -218,11 +223,12 @@ export default function AddTraining() {
         })
             .then((res) => {
                 if (!res.ok) {
-                    showError("Błąd", "Nie udało się zapisać zmian");
+                    showError("Nie udało się zapisać zmian");
                     return;
                 }
                 router.back()
-            });
+            })
+            .finally(() => setLoading(false));
     };
 
     const handleRemoveTask = (indexToRemove) => {
@@ -345,8 +351,8 @@ export default function AddTraining() {
                             <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={() => setTaskModalVisible(true)}>
                                 <Text style={styles.nextButtonText}>Dodaj nowe zadanie</Text>
                             </Pressable>
-                            <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={handleSave}>
-                                <Text style={styles.nextButtonText}>Zakończ i zapisz trening</Text>
+                            <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={handleSave} disabled={loading}>
+                                <Text style={styles.nextButtonText}>{loading ? "Zapisywanie..." : "Zapisz trening" }</Text>
                             </Pressable>
                         </View>
                         <Modal
