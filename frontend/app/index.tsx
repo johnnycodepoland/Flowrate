@@ -129,9 +129,11 @@ export default function Index() {
                 </Pressable>
             ))}
         </View>
-        <Pressable onPress={() => router.push("/all-trainings")}>
-            <Text style={styles.seeAllText}> Zobacz wszystkie →</Text>
-        </Pressable>
+        {trainings.length > 0 &&
+            <Pressable onPress={() => router.push("/all-trainings")}>
+                <Text style={styles.seeAllText}> Zobacz wszystkie →</Text>
+            </Pressable>
+        }
     </ScrollView>
     )
 }
