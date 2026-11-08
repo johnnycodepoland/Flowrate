@@ -6,11 +6,13 @@ import {useState} from "react"
 import {API_URL} from "../config";
 import {showError} from "../utils";
 import {saveToken} from "../auth"
+import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 export default function Register() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -95,15 +97,22 @@ export default function Register() {
                 placeholderTextColor="#9CA3AF"
             />
             <Text style={styles.label}>Hasło</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Minimum 8 znaków"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={true}
-                textContentType="password"
-                placeholderTextColor="#9CA3AF"
-            />
+            <View style={styles.passwordContainer}>
+                <TextInput
+                    style={[styles.input, {flex: 1}]}
+                    placeholder="Minimum 8 znaków"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    textContentType="password"
+                    placeholderTextColor="#9CA3AF"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                />
+                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                    <MaterialCommunityIcons name={showPassword ? "eye-off" : "eye"} size={22} color="#9CA3AF" />
+                </Pressable>
+            </View>
             <Pressable style={styles.nextButton} onPress={handleRegister} disabled={loading}>
                 <Text style={styles.nextButtonText}>{loading ? "Tworzenie konta..." : "Zarejestruj się"}</Text>
             </Pressable>
@@ -162,5 +171,11 @@ const styles = StyleSheet.create({
         fontFamily: "Montserrat_400Regular"},
     switchLink: {
         color: "#6366F1",
-        fontFamily: "Montserrat_700Bold"}
+        fontFamily: "Montserrat_700Bold"},
+    passwordContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F5F5F7",
+        borderRadius: 12,
+        paddingRight: 14}
 })
