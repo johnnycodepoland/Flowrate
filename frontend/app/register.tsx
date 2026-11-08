@@ -116,7 +116,7 @@ export default function Register() {
             <Pressable style={styles.nextButton} onPress={handleRegister} disabled={loading}>
                 <Text style={styles.nextButtonText}>{loading ? "Tworzenie konta..." : "Zarejestruj się"}</Text>
             </Pressable>
-            <Pressable onPress={() => router.back()}>
+            <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace("/login")}>
                 <Text style={styles.switchText}>
                     Masz już konto? <Text style={styles.switchLink}>Zaloguj się</Text>
                 </Text>
