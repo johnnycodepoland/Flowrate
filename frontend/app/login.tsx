@@ -1,12 +1,13 @@
-import {View, Text, StyleSheet, Pressable, TextInput, ScrollView, Image} from "react-native";
-import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
-import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
-import {router} from "expo-router";
-import {useState} from "react"
-import {API_URL} from "../config";
-import {showError} from "../utils";
-import {saveToken} from "../auth"
-import {MaterialCommunityIcons} from "@expo/vector-icons";
+import { View, Text, StyleSheet, Pressable, TextInput, ScrollView, Image } from "react-native";
+import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
+import { Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
+import { router } from "expo-router";
+import { useState } from "react"
+import { API_URL } from "../config";
+import { showError } from "../utils";
+import { saveToken } from "../auth"
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { fetchWithTimeout } from "@/api";
 
 export default function Login() {
     const [email, setEmail] = useState("")
@@ -32,10 +33,10 @@ export default function Login() {
                 return;
             }
 
-            const res = await fetch(`${API_URL}/auth/login`, {
+            const res = await fetchWithTimeout(`${API_URL}/auth/login`, {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({email, password}),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
             })
 
             if (!res.ok) {
@@ -47,7 +48,11 @@ export default function Login() {
             await saveToken(data.access_token)
             router.replace("/")
         }
-        finally {setLoading(false)}
+        catch {
+            showError("Brak połączenia z serwerem")
+            return;
+        }
+        finally { setLoading(false) }
     };
 
     if (!fontLoaded) {
@@ -60,7 +65,7 @@ export default function Login() {
                 source={require("../assets/images/logo.png")}
                 style={styles.logo}
                 resizeMode="contain"
-            />  
+            />
             <Text style={styles.loginText}>Zaloguj się</Text>
             <Text style={styles.label}>E-mail</Text>
             <TextInput
@@ -77,7 +82,7 @@ export default function Login() {
             <Text style={styles.label}>Hasło</Text>
             <View style={styles.passwordContainer}>
                 <TextInput
-                    style={[styles.input, {flex:1}]}
+                    style={[styles.input, { flex: 1 }]}
                     placeholder="Minimum 8 znaków"
                     value={password}
                     onChangeText={setPassword}
@@ -107,20 +112,24 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: 20,
-        backgroundColor: "#FFFFFF"},
+        backgroundColor: "#FFFFFF"
+    },
     logo: {
         width: 200,
         height: 38,
         marginBottom: 24,
-        alignSelf: "center"},
+        alignSelf: "center"
+    },
     content: {
         flexGrow: 1,
         justifyContent: "center",
-        gap: 12},
+        gap: 12
+    },
     loginText: {
         fontFamily: "Montserrat_700Bold",
         fontSize: 28,
-        color: "#1A1A1A"},
+        color: "#1A1A1A"
+    },
     input: {
         backgroundColor: "#F5F5F7",
         borderRadius: 12,
@@ -128,32 +137,39 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         fontSize: 16,
         fontFamily: "Montserrat_400Regular",
-        color: "#1A1A1A"},
+        color: "#1A1A1A"
+    },
     label: {
         color: "#1A1A1A",
         fontSize: 18,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     nextButton: {
         backgroundColor: "#6366F1",
         borderRadius: 16,
         paddingVertical: 14,
-        alignItems: "center"},
+        alignItems: "center"
+    },
     nextButtonText: {
         color: "#FFFFFF",
         fontSize: 18,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     switchText: {
         textAlign: "center",
         color: "#6B7280",
         fontSize: 14,
-        fontFamily: "Montserrat_400Regular"},
+        fontFamily: "Montserrat_400Regular"
+    },
     switchLink: {
         color: "#6366F1",
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     passwordContainer: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: "#F5F5F7",
         borderRadius: 12,
-        paddingRight: 14}
+        paddingRight: 14
+    }
 })

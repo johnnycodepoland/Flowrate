@@ -1,15 +1,16 @@
-import {ScrollView, Text, View, StyleSheet, Image, Pressable} from "react-native";
-import {useState, useEffect, useCallback} from "react";
-import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
-import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
-import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
-import {useRouter, useFocusEffect} from "expo-router";
+import { ScrollView, Text, View, StyleSheet, Image, Pressable } from "react-native";
+import { useState, useEffect, useCallback } from "react";
+import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
+import { Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useRouter, useFocusEffect } from "expo-router";
 import * as Location from "expo-location";
-import {API_URL} from "../config";
-import {apiFetch} from "../api";
+import { API_URL } from "../config";
+import { apiFetch } from "../api";
+import { showError } from "@/utils";
 
 export default function Index() {
-    const today = new Date().toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
+    const today = new Date().toLocaleDateString("pl-PL", { day: "numeric", month: "long" });
     const [day, month] = today.split(" ");
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
@@ -38,7 +39,8 @@ export default function Index() {
         useCallback(() => {
             apiFetch("/fatigue")
                 .then(response => response.ok ? response.json() : null)
-                .then(data => {if (data) setFatigue(data.percentage_fatigue)});
+                .then(data => { if (data) setFatigue(data.percentage_fatigue) })
+                .catch(() => {});
         }, [])
     );
 
@@ -46,7 +48,8 @@ export default function Index() {
         useCallback(() => {
             apiFetch("/personal-bests")
                 .then(response => response.ok ? response.json() : null)
-                .then(data => {if (data) setMissingPersonalBests(!data[200] || !data[400]) });
+                .then(data => { if (data) setMissingPersonalBests(!data[200] || !data[400]) })
+                .catch(() => {});
         }, [])
     );
 
@@ -55,6 +58,7 @@ export default function Index() {
             apiFetch("/trainings")
                 .then(response => response.ok ? response.json() : null)
                 .then(data => { if (data) setTrainings(data) })
+                .catch(() => showError("Brak połączenia z serwerem"))
         }, [])
     );
 
@@ -68,7 +72,7 @@ export default function Index() {
 
             const location = await Location.getCurrentPositionAsync({});
 
-           fetch(`${API_URL}/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}`)
+            fetch(`${API_URL}/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}`)
                 .then(response => response.json())
                 .then(data => setWeather(data));
         };
@@ -81,60 +85,60 @@ export default function Index() {
     }
 
     return (
-    <ScrollView style={styles.container}>
-        <Image
-            source={require("../assets/images/high-resolution-color-logo(1).png")}
-            style={styles.logo}
-        />
-        <Pressable style={styles.profileButton} onPress={() => router.push("/personal-bests")}>
-            <Ionicons name="person-circle-outline" size={32} color="#1A1A1A" />
-        </Pressable>
-        <View style={styles.topRow}>
-            <View style={styles.percentageCircleContainer}>
-                <View style={styles.percentageCircle}>
-                    <Text style={styles.percentageText}>{fatigue !== null ? `${Math.round(fatigue)}%` : "..."}</Text>
-                    <Text style={styles.fatigueText}>Obciążenie</Text>
-                </View>
-            </View>
-            <View style={styles.dateBox}>
-                <Text style={styles.dateText}>{day}</Text>
-                <Text style={styles.monthText}>{month}</Text>
-                <View style={{flexDirection: "row", alignItems: "center", gap: 4, marginTop: 8}}>
-                    <Ionicons name={weather !== null ? weatherIconMap[weather.condition] : "sunny"} size={16} color="#1A1A1A" />
-                    <Text style={styles.weatherText}>{weather !== null ? `${Math.round(weather.temperature)}°C` : "..."}</Text>
-                </View>
-            </View>
-        </View>
-        {missingPersonalBests && (
-            <Pressable style={styles.missingCard} onPress={() => router.push("/personal-bests")}>
-                <Text style={styles.missingCardText}>Uzupełnij rekordy na 200 i 400m, żeby zacząć liczyć obciążenie</Text>
-                <Ionicons name={"chevron-forward"} size={20} color="#6366F1" />
-            </Pressable>        
-        )}
-        <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Ostatnie treningi</Text>
-            <Pressable style={styles.plusButton} onPress={() => router.push("/add-training")}>
-                <Text style={styles.plusButtonText}>+</Text>
+        <ScrollView style={styles.container}>
+            <Image
+                source={require("../assets/images/high-resolution-color-logo(1).png")}
+                style={styles.logo}
+            />
+            <Pressable style={styles.profileButton} onPress={() => router.push("/personal-bests")}>
+                <Ionicons name="person-circle-outline" size={32} color="#1A1A1A" />
             </Pressable>
-        </View>
-        <View style={styles.activityCard}>
-            {trainings.length === 0 ? ( <Text style={styles.emptyText}>Brak treningów. Dodaj pierwszy przyciskiem +</Text> ) : trainings.slice(0, 6).map((training, index) => (
-                <Pressable key={training.id} style={styles.activityRow} onPress={() => router.push(`/training/${training.id}`)}>
-                    <View style={styles.iconBadge}>
-                        <MaterialCommunityIcons name="swim" size={28} color="#FFFFFF"/>
-                        <Text style={styles.iconBadgeText}>{training.RPE}</Text>
+            <View style={styles.topRow}>
+                <View style={styles.percentageCircleContainer}>
+                    <View style={styles.percentageCircle}>
+                        <Text style={styles.percentageText}>{fatigue !== null ? `${Math.round(fatigue)}%` : "..."}</Text>
+                        <Text style={styles.fatigueText}>Obciążenie</Text>
                     </View>
-                    <Text style={styles.activityTitle}>Pływanie</Text>
-                    <Text style={styles.activityTime}>{training.time} min</Text>
+                </View>
+                <View style={styles.dateBox}>
+                    <Text style={styles.dateText}>{day}</Text>
+                    <Text style={styles.monthText}>{month}</Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 8 }}>
+                        <Ionicons name={weather !== null ? weatherIconMap[weather.condition] : "sunny"} size={16} color="#1A1A1A" />
+                        <Text style={styles.weatherText}>{weather !== null ? `${Math.round(weather.temperature)}°C` : "..."}</Text>
+                    </View>
+                </View>
+            </View>
+            {missingPersonalBests && (
+                <Pressable style={styles.missingCard} onPress={() => router.push("/personal-bests")}>
+                    <Text style={styles.missingCardText}>Uzupełnij rekordy na 200 i 400m, żeby zacząć liczyć obciążenie</Text>
+                    <Ionicons name={"chevron-forward"} size={20} color="#6366F1" />
                 </Pressable>
-            ))}
-        </View>
-        {trainings.length > 0 &&
-            <Pressable onPress={() => router.push("/all-trainings")}>
-                <Text style={styles.seeAllText}> Zobacz wszystkie →</Text>
-            </Pressable>
-        }
-    </ScrollView>
+            )}
+            <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Ostatnie treningi</Text>
+                <Pressable style={styles.plusButton} onPress={() => router.push("/add-training")}>
+                    <Text style={styles.plusButtonText}>+</Text>
+                </Pressable>
+            </View>
+            <View style={styles.activityCard}>
+                {trainings.length === 0 ? (<Text style={styles.emptyText}>Brak treningów. Dodaj pierwszy przyciskiem +</Text>) : trainings.slice(0, 6).map((training, index) => (
+                    <Pressable key={training.id} style={styles.activityRow} onPress={() => router.push(`/training/${training.id}`)}>
+                        <View style={styles.iconBadge}>
+                            <MaterialCommunityIcons name="swim" size={28} color="#FFFFFF" />
+                            <Text style={styles.iconBadgeText}>{training.RPE}</Text>
+                        </View>
+                        <Text style={styles.activityTitle}>Pływanie</Text>
+                        <Text style={styles.activityTime}>{training.time} min</Text>
+                    </Pressable>
+                ))}
+            </View>
+            {trainings.length > 0 &&
+                <Pressable onPress={() => router.push("/all-trainings")}>
+                    <Text style={styles.seeAllText}> Zobacz wszystkie →</Text>
+                </Pressable>
+            }
+        </ScrollView>
     )
 }
 
@@ -142,19 +146,22 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingHorizontal: 20,
-        backgroundColor: "#FFFFFF"},
+        backgroundColor: "#FFFFFF"
+    },
     logo: {
         width: 672,
         height: 144,
         resizeMode: "contain",
         marginTop: 15,
         marginBottom: -70,
-        alignSelf: "center"},
+        alignSelf: "center"
+    },
     percentageCircleContainer: {
         width: "50%",
         justifyContent: "center",
         alignItems: "center",
-        marginVertical: 24},
+        marginVertical: 24
+    },
     percentageCircle: {
         width: 140,
         height: 140,
@@ -163,52 +170,63 @@ const styles = StyleSheet.create({
         borderColor: "#6366F1",
         justifyContent: "center",
         marginTop: 0,
-        alignItems: "center"},
+        alignItems: "center"
+    },
     percentageText: {
         color: "#1A1A1A",
         fontSize: 45,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     topRow: {
         flexDirection: "row",
-        justifyContent: "flex-start"},
+        justifyContent: "flex-start"
+    },
     dateText: {
         color: "#1A1A1A",
         fontSize: 48,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     weatherText: {
         color: "#1A1A1A",
         fontSize: 19,
-        fontFamily: "Montserrat_400Regular"},
+        fontFamily: "Montserrat_400Regular"
+    },
     fatigueText: {
         color: "#1A1A1A",
         fontSize: 11.5,
         letterSpacing: 1,
         textTransform: "uppercase",
-        fontFamily: "Inter_700Bold"},
+        fontFamily: "Inter_700Bold"
+    },
     sectionHeader: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        marginTop: 16},
+        marginTop: 16
+    },
     sectionTitle: {
         fontSize: 22,
         color: "#1A1A1A",
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     plusButton: {
         width: 44,
         height: 44,
         borderRadius: 22,
         backgroundColor: "#1A1A1A",
         justifyContent: "center",
-        alignItems: "center"},
+        alignItems: "center"
+    },
     plusButtonText: {
         color: "#FFFFFF",
         fontSize: 24,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     dateBox: {
         justifyContent: "center",
         alignItems: "center",
-        width: 170},
+        width: 170
+    },
     activityRow: {
         flexDirection: "row",
         paddingVertical: 8,
@@ -216,7 +234,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#1A1A1A",
         borderRadius: 14,
-        alignItems: "center"},
+        alignItems: "center"
+    },
     activityTitle: {
         flex: 1,
         marginRight: 8,
@@ -225,7 +244,8 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
         textTransform: "uppercase",
         fontFamily: "Inter_700Bold",
-        marginLeft: 12},
+        marginLeft: 12
+    },
     iconBadge: {
         width: 88,
         height: 44,
@@ -234,39 +254,46 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "row",
-        gap: 6},
+        gap: 6
+    },
     iconBadgeText: {
         color: "#FFFFFF",
         fontSize: 16,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     activityTime: {
         color: "#1A1A1A",
         fontSize: 13,
         letterSpacing: 1,
         textTransform: "uppercase",
-        fontFamily: "Inter_700Bold"},
+        fontFamily: "Inter_700Bold"
+    },
     seeAllText: {
         color: "#6366F1",
         fontSize: 14,
         textAlign: "right",
         marginTop: 10,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     activityCard: {
         backgroundColor: "#F5F5F7",
-        borderRadius:20,
+        borderRadius: 20,
         padding: 16,
         gap: 8,
-        marginTop: 16},
+        marginTop: 16
+    },
     monthText: {
         fontFamily: "Inter_700Bold",
         textTransform: "uppercase",
         letterSpacing: 1,
         fontSize: 13.5,
-        color: "#1A1A1A"},
+        color: "#1A1A1A"
+    },
     profileButton: {
         position: "absolute",
         top: 71,
-        right: 0},
+        right: 0
+    },
     missingCard: {
         backgroundColor: "#F5F5F7",
         borderRadius: 16,
@@ -274,7 +301,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 12,
-        marginBottom: 16},
+        marginBottom: 16
+    },
     missingCardText: {
         flex: 1,
         color: "#1A1A1A",
@@ -285,5 +313,6 @@ const styles = StyleSheet.create({
         color: "#6B7280",
         textAlign: "center",
         fontSize: 14,
-        fontFamily: "Montserrat_400Regular"}
+        fontFamily: "Montserrat_400Regular"
+    }
 })

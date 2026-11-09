@@ -5,6 +5,7 @@ import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
 import {useRouter, useFocusEffect} from "expo-router";
 import {apiFetch} from "../api";
+import { showError } from "@/utils";
 
 export default function AllTrainings() {
     const [fontLoaded] = useFonts({
@@ -20,7 +21,8 @@ export default function AllTrainings() {
         useCallback(() => {
             apiFetch("/trainings")
                 .then(response => response.ok ? response.json() : null)
-                .then(data => {if (data) setTrainings(data) });
+                .then(data => {if (data) setTrainings(data) })
+                .catch(() => showError("Brak połączenia z serwerem"));
         }, [])
     );
 

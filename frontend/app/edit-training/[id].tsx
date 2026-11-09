@@ -1,22 +1,22 @@
-import {useState, useEffect} from "react";
-import {View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert} from "react-native";
-import {useRouter, useLocalSearchParams} from "expo-router";
-import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
+import { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert } from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
-import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
-import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
-import {Swipeable, ScrollView} from "react-native-gesture-handler";
+import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
+import { Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
+import { Swipeable, ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import {parseDecimal, hasAnyTime, showError} from "../../utils";
-import {apiFetch} from "../../api";
+import { parseDecimal, hasAnyTime, showError } from "../../utils";
+import { apiFetch } from "../../api";
 
 export default function AddTraining() {
-    const {id} = useLocalSearchParams();
+    const { id } = useLocalSearchParams();
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [rpe, setRpe] = useState(5);
     const [date, setDate] = useState(new Date());
-    const formattedDate = date.toLocaleDateString("pl-PL", {day: "numeric", month: "long", year: "numeric"});
+    const formattedDate = date.toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [taskDescription, setTaskDescription] = useState("");
     const [taskReps, setTaskReps] = useState("");
@@ -43,11 +43,11 @@ export default function AddTraining() {
     });
 
     const handleBack = () => {
-        if (step ===1) {
+        if (step === 1) {
             router.back();
-         } else {
-             setStep(step - 1);
-         }
+        } else {
+            setStep(step - 1);
+        }
     };
 
     const getRepDistance = (task) => {
@@ -84,7 +84,7 @@ export default function AddTraining() {
                 "Trening",
                 "Nie dodano żadnego segmentu",
                 [
-                    { text: "Ok", style: "cancel"},
+                    { text: "Ok", style: "cancel" },
                 ]
             );
             return;
@@ -129,17 +129,17 @@ export default function AddTraining() {
                     "Czasy",
                     "Nie dodano żadnego czasu",
                     [
-                        { text: "Ok", style: "cancel"},
+                        { text: "Ok", style: "cancel" },
                     ]
                 );
                 return;
-                }
-                let sum = 0
-                for (const time of times) {
-                    sum = sum + time
-                }
-                segmentAverage = Math.round(sum / times.length * 10) / 10;
-                }
+            }
+            let sum = 0
+            for (const time of times) {
+                sum = sum + time
+            }
+            segmentAverage = Math.round(sum / times.length * 10) / 10;
+        }
 
         if (!(Number(distance) > 0)) {
             showError('Podaj dystans segmentu')
@@ -200,7 +200,7 @@ export default function AddTraining() {
                 "Czas",
                 "Podany czas jest niepoprawny",
                 [
-                    { text: "Ok", style: "cancel"},
+                    { text: "Ok", style: "cancel" },
                 ]
             );
             return;
@@ -218,7 +218,7 @@ export default function AddTraining() {
 
         apiFetch(`/trainings/${id}`, {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(newTraining),
         })
             .then((res) => {
@@ -228,6 +228,7 @@ export default function AddTraining() {
                 }
                 router.back()
             })
+            .catch(() => showError("Brak połączenia z serwerem"))
             .finally(() => setLoading(false));
     };
 
@@ -237,7 +238,7 @@ export default function AddTraining() {
 
     const handleRemoveSegment = (indexToRemove) => {
         setCurrentSegments(currentSegments.filter((_, index) => index !== indexToRemove)
-            .map((segment, index) => ({...segment, position: index + 1})));
+            .map((segment, index) => ({ ...segment, position: index + 1 })));
     };
 
     useEffect(() => {
@@ -249,7 +250,8 @@ export default function AddTraining() {
                 setRpe(data.RPE);
                 setDate(new Date(data.date));
                 setTasks(data.tasks);
-            });
+            })
+            .catch(() => showError("Brak połączenia z serwerem"));
     }, []);
 
     if (!fontLoaded) {
@@ -279,7 +281,7 @@ export default function AddTraining() {
                         <Text style={styles.hint}>Wyczyść, żeby policzyć z segmentów.</Text>
                         <Text style={styles.label}>RPE sesji: {rpe}</Text>
                         <Slider
-                            style={{width: "100%", height: 40}}
+                            style={{ width: "100%", height: 40 }}
                             minimumValue={1}
                             maximumValue={10}
                             step={1}
@@ -313,7 +315,7 @@ export default function AddTraining() {
 
                 {step === 2 && (
                     <>
-                        <ScrollView contentContainerStyle={{paddingBottom: 20}}>
+                        <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
                             <View style={styles.tasksList}>
                                 {tasks.map((task, index) => (
                                     <Swipeable
@@ -348,11 +350,11 @@ export default function AddTraining() {
                             </View>
                         </ScrollView>
                         <View style={styles.footer}>
-                            <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={() => setTaskModalVisible(true)}>
+                            <Pressable style={[styles.nextButton, { marginTop: 0 }]} onPress={() => setTaskModalVisible(true)}>
                                 <Text style={styles.nextButtonText}>Dodaj nowe zadanie</Text>
                             </Pressable>
-                            <Pressable style={[styles.nextButton, {marginTop: 0}]} onPress={handleSave} disabled={loading}>
-                                <Text style={styles.nextButtonText}>{loading ? "Zapisywanie..." : "Zapisz trening" }</Text>
+                            <Pressable style={[styles.nextButton, { marginTop: 0 }]} onPress={handleSave} disabled={loading}>
+                                <Text style={styles.nextButtonText}>{loading ? "Zapisywanie..." : "Zapisz trening"}</Text>
                             </Pressable>
                         </View>
                         <Modal
@@ -362,7 +364,7 @@ export default function AddTraining() {
                         >
                             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                                 <View style={styles.modalContent}>
-                                    <Pressable onPress={() => setTaskModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
+                                    <Pressable onPress={() => setTaskModalVisible(false)} style={{ padding: 20, alignSelf: "flex-end" }}>
                                         <Ionicons name="close" size={28} color="#1A1A1A" />
                                     </Pressable>
                                     <Text style={styles.label}>Opis zadania</Text>
@@ -393,7 +395,7 @@ export default function AddTraining() {
 
                                     <View style={styles.tasksList}>
                                         {currentSegments.map((segment, index) => (
-                                        <Swipeable
+                                            <Swipeable
                                                 key={index}
                                                 renderRightActions={() => (
                                                     <Pressable style={styles.deleteAction} onPress={() => handleRemoveSegment(index)}>
@@ -420,7 +422,7 @@ export default function AddTraining() {
                                     <Pressable style={styles.nextButton} onPress={() => setSegmentModalVisible(true)}>
                                         <Text style={styles.nextButtonText}>Dodaj nowy segment</Text>
                                     </Pressable>
-                                    <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddTask}>
+                                    <Pressable style={[styles.nextButton, { marginTop: 12 }]} onPress={handleAddTask}>
                                         <Text style={styles.nextButtonText}>Zatwierdź</Text>
                                     </Pressable>
                                     <Modal
@@ -429,7 +431,7 @@ export default function AddTraining() {
                                         presentationStyle="pageSheet"
                                     >
                                         <ScrollView style={styles.modalContent} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets keyboardDismissMode="on-drag">
-                                            <Pressable onPress={() => setSegmentModalVisible(false)} style={{padding: 20, alignSelf: "flex-end"}}>
+                                            <Pressable onPress={() => setSegmentModalVisible(false)} style={{ padding: 20, alignSelf: "flex-end" }}>
                                                 <Ionicons name="close" size={28} color="#1A1A1A" />
                                             </Pressable>
                                             <Text style={styles.label}>Opis segmentu</Text>
@@ -449,16 +451,16 @@ export default function AddTraining() {
                                                 keyboardType="number-pad"
                                             />
 
-                                            <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
+                                            <View style={{ flexDirection: "row", gap: 8, marginTop: 20 }}>
                                                 <Pressable
                                                     style={[styles.modeButton, hasTime === true && styles.modeButtonActive]}
                                                     onPress={() => setHasTime(true)}>
-                                                    <Text style={hasTime === true && {color: "#FFFFFF"}}>Z czasem</Text>
+                                                    <Text style={hasTime === true && { color: "#FFFFFF" }}>Z czasem</Text>
                                                 </Pressable>
                                                 <Pressable
                                                     style={[styles.modeButton, hasTime === false && styles.modeButtonActive]}
                                                     onPress={() => setHasTime(false)}>
-                                                    <Text style={hasTime === false && {color: "#FFFFFF"}}>Bez czasu</Text>
+                                                    <Text style={hasTime === false && { color: "#FFFFFF" }}>Bez czasu</Text>
                                                 </Pressable>
                                             </View>
 
@@ -473,16 +475,16 @@ export default function AddTraining() {
                                                         keyboardType="decimal-pad"
                                                     />
 
-                                                    <View style={{flexDirection: "row", gap: 8, marginTop: 20}}>
+                                                    <View style={{ flexDirection: "row", gap: 8, marginTop: 20 }}>
                                                         <Pressable
                                                             style={[styles.modeButton, timeMode === "average" && styles.modeButtonActive]}
                                                             onPress={() => setTimeMode("average")}>
-                                                            <Text style={timeMode === "average" && {color: "#FFFFFF"}}>Średni</Text>
+                                                            <Text style={timeMode === "average" && { color: "#FFFFFF" }}>Średni</Text>
                                                         </Pressable>
                                                         <Pressable
                                                             style={[styles.modeButton, timeMode === "each" && styles.modeButtonActive]}
                                                             onPress={() => setTimeMode("each")}>
-                                                            <Text style={timeMode === "each" && {color: "#FFFFFF"}}>Każde powtórzenie</Text>
+                                                            <Text style={timeMode === "each" && { color: "#FFFFFF" }}>Każde powtórzenie</Text>
                                                         </Pressable>
                                                     </View>
 
@@ -498,40 +500,40 @@ export default function AddTraining() {
                                                             />
                                                         </>
                                                     )}
-                                            {timeMode === "each" && (
-                                                <>
-                                                    <View style={{flexDirection: "row", gap: 8, alignItems: "center", marginTop: 20}}>
-                                                        <TextInput
-                                                            style={[styles.input, {flex: 1}]}
-                                                            placeholder="czas powtórzenia, np. 32"
-                                                            value={timeInput}
-                                                            onChangeText={setTimeInput}
-                                                            keyboardType="decimal-pad"
-                                                        />
-                                                        <Pressable style={[styles.nextButton, {marginTop: 0, paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12}]} onPress={handleAddTime}>
-                                                            <Text style={styles.nextButtonText}>Dodaj</Text>
-                                                        </Pressable>
-                                                    </View>
-                                                    {times.length > 0 && (
+                                                    {timeMode === "each" && (
                                                         <>
-                                                            <View style={styles.timesList}>
-                                                                {times.map((t, index) => (
-                                                                    <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
-                                                                        <Text>{t}s ✕</Text>
-                                                                    </Pressable>
-                                                                ))}
+                                                            <View style={{ flexDirection: "row", gap: 8, alignItems: "center", marginTop: 20 }}>
+                                                                <TextInput
+                                                                    style={[styles.input, { flex: 1 }]}
+                                                                    placeholder="czas powtórzenia, np. 32"
+                                                                    value={timeInput}
+                                                                    onChangeText={setTimeInput}
+                                                                    keyboardType="decimal-pad"
+                                                                />
+                                                                <Pressable style={[styles.nextButton, { marginTop: 0, paddingVertical: 12, paddingHorizontal: 20, borderRadius: 12 }]} onPress={handleAddTime}>
+                                                                    <Text style={styles.nextButtonText}>Dodaj</Text>
+                                                                </Pressable>
                                                             </View>
+                                                            {times.length > 0 && (
+                                                                <>
+                                                                    <View style={styles.timesList}>
+                                                                        {times.map((t, index) => (
+                                                                            <Pressable key={index} style={styles.timeChip} onPress={() => handleRemoveTime(index)}>
+                                                                                <Text>{t}s ✕</Text>
+                                                                            </Pressable>
+                                                                        ))}
+                                                                    </View>
+                                                                </>
+                                                            )}
                                                         </>
                                                     )}
                                                 </>
                                             )}
-                                        </>
-                                    )}
-                                            <Pressable style={[styles.nextButton, {marginTop: 12}]} onPress={handleAddSegment}>
+                                            <Pressable style={[styles.nextButton, { marginTop: 12 }]} onPress={handleAddSegment}>
                                                 <Text style={styles.nextButtonText}>Zatwierdź</Text>
                                             </Pressable>
                                         </ScrollView>
-                                </Modal>
+                                    </Modal>
                                 </View>
                             </TouchableWithoutFeedback>
                         </Modal>
@@ -547,40 +549,48 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 20,
         paddingTop: 70,
-        backgroundColor: "#FFFFFF"},
+        backgroundColor: "#FFFFFF"
+    },
     addTrainingSectionHeader: {
-        flexDirection: "row"},
+        flexDirection: "row"
+    },
     pageTitle: {
         fontSize: 32,
         color: "#1A1A1A",
         fontFamily: "Montserrat_700Bold",
-        marginBottom: 20},
+        marginBottom: 20
+    },
     label: {
         color: "#1A1A1A",
         fontSize: 18,
         fontFamily: "Montserrat_700Bold",
         marginTop: 20,
-        marginBottom: 8},
+        marginBottom: 8
+    },
     dateText: {
         color: "#1A1A1A",
         fontSize: 18,
-        fontFamily: "Montserrat_400Regular"},
+        fontFamily: "Montserrat_400Regular"
+    },
     dateBox: {
         backgroundColor: "#F5F5F7",
         borderRadius: 12,
         paddingVertical: 10,
         paddingHorizontal: 14,
-        alignSelf: "flex-start"},
+        alignSelf: "flex-start"
+    },
     nextButton: {
         backgroundColor: "#6366F1",
         borderRadius: 16,
         paddingVertical: 14,
         alignItems: "center",
-        marginTop: 40},
+        marginTop: 40
+    },
     nextButtonText: {
         color: "#FFFFFF",
         fontSize: 18,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     input: {
         backgroundColor: "#F5F5F7",
         borderRadius: 12,
@@ -588,66 +598,82 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         fontSize: 16,
         fontFamily: "Montserrat_400Regular",
-        color: "#1A1A1A"},
+        color: "#1A1A1A"
+    },
     tasksList: {
         marginTop: 20,
-        gap: 8},
+        gap: 8
+    },
     taskCard: {
         backgroundColor: "#F5F5F7",
         borderRadius: 20,
-        padding: 16},
+        padding: 16
+    },
     taskTitle: {
         color: "#1A1A1A",
         fontSize: 22,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     taskDetailsRow: {
         flexDirection: "row",
         gap: 16,
-        marginTop: 8},
+        marginTop: 8
+    },
     taskDetailItem: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 4},
+        gap: 4
+    },
     taskDetailText: {
         color: "#1A1A1A",
         fontSize: 18,
-        fontFamily: "Inter_400Regular"},
+        fontFamily: "Inter_400Regular"
+    },
     deleteAction: {
         backgroundColor: "#FF3B30",
         justifyContent: "center",
         alignItems: "center",
         width: 80,
-        borderRadius: 20},
+        borderRadius: 20
+    },
     deleteActionText: {
         color: "#FFFFFF",
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     modalContent: {
         flex: 1,
         paddingHorizontal: 20,
-        backgroundColor: "#FFFFFF"},
+        backgroundColor: "#FFFFFF"
+    },
     modeButton: {
         backgroundColor: "#F5F5F7",
         borderRadius: 12,
         paddingVertical: 10,
-        paddingHorizontal: 14},
+        paddingHorizontal: 14
+    },
     modeButtonActive: {
-        backgroundColor: "#6366F1"},
+        backgroundColor: "#6366F1"
+    },
     timesList: {
         flexDirection: "row",
         flexWrap: "wrap",
         gap: 8,
-        marginTop:12},
+        marginTop: 12
+    },
     timeChip: {
         backgroundColor: "#F5F5F7",
         borderRadius: 12,
         paddingVertical: 6,
-        paddingHorizontal: 12},
+        paddingHorizontal: 12
+    },
     hint: {
         fontSize: 12,
         color: "#888",
         marginTop: 4,
-        fontFamily: "Inter_400Regular"},
+        fontFamily: "Inter_400Regular"
+    },
     footer: {
         paddingBottom: 40,
-        gap: 12},
+        gap: 12
+    },
 })

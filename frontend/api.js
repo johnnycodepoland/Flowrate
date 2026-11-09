@@ -4,24 +4,31 @@ import {router} from "expo-router"
 
 export const apiFetch = async (path, options = {}) => {
     const token = await getToken();
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000)
-    let res;
-    try {
-        res = await fetch(`${API_URL}${path}`, {
+    const res = await fetchWithTimeout(`${API_URL}${path}`, {
         ...options,
-        signal: controller.signal,
         headers: {
             ...options.headers,
-            Authorization: `Bearer ${token}`,
+            Authorization:`Bearer ${token}`, 
         },
-        });
-    } 
-    finally {clearTimeout(timeout)}
+    });
 
     if (res.status === 401) {
         await deleteToken();
         router.replace("/login")
     }
+    return res;
+};
+
+export const fetchWithTimeout = async (url, options = {}) => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000)
+    let res;
+    try {
+        res = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+        });
+    } 
+    finally {clearTimeout(timeout)}
     return res;
 };

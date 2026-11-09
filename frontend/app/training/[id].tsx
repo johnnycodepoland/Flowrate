@@ -1,24 +1,26 @@
-import {Pressable, StyleSheet, ScrollView, Text, View, Alert} from "react-native";
-import {useState, useEffect, useCallback} from "react"
-import {useFocusEffect, useLocalSearchParams} from "expo-router";
-import {Ionicons, MaterialCommunityIcons} from "@expo/vector-icons";
-import {useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
-import {Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
-import {useRouter} from "expo-router";
-import {hasAnyTime} from "../../utils"
-import {apiFetch} from "../../api";
+import { Pressable, StyleSheet, ScrollView, Text, View, Alert } from "react-native";
+import { useState, useCallback } from "react"
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
+import { Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
+import { useRouter } from "expo-router";
+import { hasAnyTime } from "../../utils"
+import { apiFetch } from "../../api";
+import { showError } from "../../utils";
 
 export default function TrainingDetails() {
-    const {id} = useLocalSearchParams();
+    const { id } = useLocalSearchParams();
     const router = useRouter();
     const [training, setTraining] = useState(null);
     const [expandedIndex, setExpandedIndex] = useState(null);
 
-    useFocusEffect (
+    useFocusEffect(
         useCallback(() => {
             apiFetch(`/trainings/${id}`)
                 .then(response => response.ok ? response.json() : null)
-                .then(data => {if (data) setTraining(data) });
+                .then(data => { if (data) setTraining(data) })
+                .catch(() => showError("Brak połączenia z serwerem"));
         }, [id])
     );
 
@@ -59,8 +61,8 @@ export default function TrainingDetails() {
             "Co chcesz zrobić?",
             [
                 { text: "Edytuj", onPress: () => router.push(`/edit-training/${id}`) },
-                { text: "Usuń", onPress: handleDelete, style: "destructive"},
-                { text: "Anuluj", style: "cancel"},
+                { text: "Usuń", onPress: handleDelete, style: "destructive" },
+                { text: "Anuluj", style: "cancel" },
             ]
         );
     };
@@ -73,34 +75,35 @@ export default function TrainingDetails() {
         return null;
     }
 
-    const formattedDate = new Date(training.date).toLocaleDateString("pl-PL", {day: "numeric", month: "long"});
+    const formattedDate = new Date(training.date).toLocaleDateString("pl-PL", { day: "numeric", month: "long" });
 
     const handleDelete = () => {
         apiFetch(`/trainings/${id}`, {
             method: "DELETE"
         })
-            .then(() => router.back());
+            .then(() => router.back())
+            .catch(() => showError("Brak połączenia z serwerem"));
     };
 
     return (
         <ScrollView style={styles.container}>
-             <View style={styles.trainingSectionHeader}>
-             <Pressable onPress={() => router.back()}>
-                <Ionicons name="chevron-back" size={32} color="#1A1A1A" />
-             </Pressable>
-             <View style={styles.swimmingAndDateSection}>
-                <Text style={styles.pageTittle}>Pływanie</Text>
-                <Text style={styles.pageSubtitle}>{formattedDate}</Text>
-             </View>
-             <Pressable style={styles.menuButton} onPress={handleOptionPress}>
-                <Ionicons name="ellipsis-horizontal" size={24} color="#1A1A1A" />
-             </Pressable>
-             </View>
-             <View style={styles.heroStat}>
+            <View style={styles.trainingSectionHeader}>
+                <Pressable onPress={() => router.back()}>
+                    <Ionicons name="chevron-back" size={32} color="#1A1A1A" />
+                </Pressable>
+                <View style={styles.swimmingAndDateSection}>
+                    <Text style={styles.pageTittle}>Pływanie</Text>
+                    <Text style={styles.pageSubtitle}>{formattedDate}</Text>
+                </View>
+                <Pressable style={styles.menuButton} onPress={handleOptionPress}>
+                    <Ionicons name="ellipsis-horizontal" size={24} color="#1A1A1A" />
+                </Pressable>
+            </View>
+            <View style={styles.heroStat}>
                 <Text style={styles.heroNumber}>{training.RPE}</Text>
                 <Text style={styles.heroLabel}>RPE sesji</Text>
-             </View>
-             <View style={styles.statsRow}>
+            </View>
+            <View style={styles.statsRow}>
                 <View style={styles.statBox}>
                     <View style={styles.statHeader}>
                         <MaterialCommunityIcons name="clock-outline" size={18} color="#1A1A1A" />
@@ -115,9 +118,9 @@ export default function TrainingDetails() {
                     </View>
                     <Text style={styles.statNumber}>{training.distance} m</Text>
                 </View>
-             </View>
-             <Text style={styles.sectionTitle}>Zadania</Text>
-             <View style={styles.tasksList}>
+            </View>
+            <Text style={styles.sectionTitle}>Zadania</Text>
+            <View style={styles.tasksList}>
                 {training.tasks.map((task, index) => (
                     <Pressable key={index} style={styles.taskCard} onPress={() => toggleExpand(index)}>
                         <Text style={styles.taskTitle}>{task.description}</Text>
@@ -150,8 +153,8 @@ export default function TrainingDetails() {
                             </View>
                         )}
                     </Pressable>
-                    ))}
-             </View>
+                ))}
+            </View>
         </ScrollView>
     )
 }
@@ -161,7 +164,8 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 20,
         paddingTop: 70,
-        backgroundColor: "#FFFFFF"},
+        backgroundColor: "#FFFFFF"
+    },
     pageTittle: {
         flex: 1,
         marginRight: 8,
@@ -170,102 +174,125 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
         textTransform: "uppercase",
         fontFamily: "Inter_700Bold",
-        marginLeft: 12},
+        marginLeft: 12
+    },
     trainingSectionHeader: {
         alignItems: "center",
-        flexDirection: "row"},
+        flexDirection: "row"
+    },
     swimmingAndDateSection: {
         alignItems: "center",
-        flexDirection: "column"},
+        flexDirection: "column"
+    },
     heroStat: {
         marginTop: 15,
-        flexDirection: "column"},
+        flexDirection: "column"
+    },
     heroNumber: {
         color: "#6366F1",
         fontSize: 40,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     heroLabel: {
         color: "#1A1A1A",
         fontSize: 14,
         letterSpacing: 1,
         textTransform: "uppercase",
-        fontFamily: "Inter_700Bold"},
+        fontFamily: "Inter_700Bold"
+    },
     pageSubtitle: {
         color: "#1A1A1A",
         fontSize: 16,
-        fontFamily: "Montserrat_400Regular"},
+        fontFamily: "Montserrat_400Regular"
+    },
     statsRow: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginTop: 30,
-        gap: 12},
+        gap: 12
+    },
     statBox: {
         height: 125,
         borderRadius: 20,
         flex: 1,
         backgroundColor: "#F5F5F7",
         padding: 16,
-        alignItems: "flex-start"},
+        alignItems: "flex-start"
+    },
     statLabel: {
         color: "#1A1A1A",
         fontSize: 12,
         letterSpacing: 1,
         textTransform: "uppercase",
-        fontFamily: "Inter_700Bold"},
+        fontFamily: "Inter_700Bold"
+    },
     statHeader: {
         flexDirection: "row",
         alignItems: "center",
         gap: 6,
-        marginBottom: 8},
+        marginBottom: 8
+    },
     statNumber: {
         fontFamily: "Montserrat_700Bold",
         color: "#1A1A1A",
         fontSize: 30,
-        marginTop: 4},
+        marginTop: 4
+    },
     sectionTitle: {
         marginTop: 30,
         fontSize: 30,
         color: "#1A1A1A",
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     tasksList: {
         marginTop: 20,
-        gap: 8},
+        gap: 8
+    },
     taskCard: {
         minHeight: 100,
         backgroundColor: "#F5F5F7",
         borderRadius: 20,
-        padding: 16},
+        padding: 16
+    },
     taskTitle: {
         color: "#1A1A1A",
         fontSize: 22,
-        fontFamily: "Montserrat_700Bold"},
+        fontFamily: "Montserrat_700Bold"
+    },
     taskDetailsRow: {
         flexDirection: "row",
         gap: 16,
-        marginTop: 8},
+        marginTop: 8
+    },
     taskDetailItem: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 4},
+        gap: 4
+    },
     taskDetailText: {
         color: "#1A1A1A",
         fontSize: 18,
-        fontFamily: "Inter_400Regular"},
+        fontFamily: "Inter_400Regular"
+    },
     menuButton: {
-        marginLeft: "auto"},
+        marginLeft: "auto"
+    },
     segmentsContainer: {
         marginTop: 12,
         paddingTop: 12,
         borderTopWidth: 1,
         borderTopColor: "#E0E0E0",
-        gap: 4},
+        gap: 4
+    },
     segmentText: {
         color: "#6B7280",
         fontSize: 14,
-        fontFamily: "Inter_400Regular"},
+        fontFamily: "Inter_400Regular"
+    },
     timesText: {
         color: "#6B7280",
         fontsize: 12,
         fontFamily: "Inter_400Regular",
-        marginTop: 2}
+        marginTop: 2
+    }
 })
