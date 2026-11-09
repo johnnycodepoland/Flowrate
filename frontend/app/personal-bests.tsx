@@ -18,6 +18,7 @@ export default function PersonalBests() {
     });
 
     const handleSave = async () => {
+        try {
         for (const distance of [50, 100, 200, 400]) {
             if (times[distance] === "") continue;
 
@@ -36,6 +37,11 @@ export default function PersonalBests() {
                 showError("Nie udało się zapisać rekordu")
                 return;
             }
+        }
+        }   
+        catch {
+            showError("Brak połączenia z serwerem")
+            return;
         }
         goBack()
     };
@@ -65,7 +71,8 @@ export default function PersonalBests() {
                 200: data[200] ? formatTime(data[200]) : "",
                 400: data[400] ? formatTime(data[400]) : "",
             });
-        });
+        })
+        .catch(() => showError("Brak połączenia z serwerem"));
     }, []);
 
 if (!fontLoaded) {

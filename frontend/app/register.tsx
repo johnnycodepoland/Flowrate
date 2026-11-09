@@ -7,6 +7,7 @@ import {API_URL} from "../config";
 import {showError} from "../utils";
 import {saveToken} from "../auth"
 import {MaterialCommunityIcons} from "@expo/vector-icons";
+import {fetchWithTimeout} from "@/api";
 
 export default function Register() {
     const [email, setEmail] = useState("")
@@ -37,7 +38,7 @@ export default function Register() {
                 return;
             }
 
-            const res = await fetch(`${API_URL}/auth/register`, {
+            const res = await fetchWithTimeout(`${API_URL}/auth/register`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({email, password}),
@@ -53,7 +54,7 @@ export default function Register() {
                 return;
             }
 
-            const res2 = await fetch(`${API_URL}/auth/login`, {
+            const res2 = await fetchWithTimeout(`${API_URL}/auth/login`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({email, password}),
@@ -68,6 +69,10 @@ export default function Register() {
             const data = await res2.json()
             await saveToken(data.access_token)
             router.replace("/")
+        }
+        catch {
+            showError("Brak połączenia z serwerem")
+            return;
         }
         finally { setLoading(false) }
     };
