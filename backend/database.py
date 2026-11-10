@@ -6,7 +6,11 @@ class Database:
         # Ustawiamy zmienną środowiskową, którą można wybrać przy starcie serwera
         db_name = os.environ.get("FLOWRATE_DB", default="flowrate_dev.db")
 
-        db_path = os.path.join(os.path.dirname(__file__), f"../{db_name}")
+        # Sprawdzamy czy ścieżka jest absolutna, czy względna, w zależności od tego czy odpalamy bazę lokalnie, czy przez Railway
+        if os.path.isabs(db_name):
+            db_path = db_name
+        else:
+            db_path = os.path.join(os.path.dirname(__file__), f"../{db_name}")
 
         # Umożlwiamy odpalenie bazy danych z dowolnego miejsca
         self.connection = sqlite3.connect(db_path, check_same_thread=False)
