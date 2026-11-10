@@ -8,6 +8,9 @@ INTENSITY_EXPONENT = 3
 # Waga gęstości
 DENSITY_WEIGHT = 15
 
+# Waga kosztu zużycia rezerwy
+RESERVE_WEIGHT = 1.6
+
 # Wykładnik gęstości
 DENSITY_EXPONENT = 5
 
@@ -133,7 +136,7 @@ def task_load(task, critical_speed, personal_bests):
         if I is None:
             continue
 
-        segment_load = get_average_time(segment) * task.task_reps * I ** INTENSITY_EXPONENT * (1 + DENSITY_WEIGHT * d ** DENSITY_EXPONENT * X * repeat_factor)
+        segment_load = get_average_time(segment) * task.task_reps * I ** INTENSITY_EXPONENT * (1 + RESERVE_WEIGHT * X ** 2 + DENSITY_WEIGHT * d ** DENSITY_EXPONENT * X * repeat_factor)
 
         total_load += segment_load
 

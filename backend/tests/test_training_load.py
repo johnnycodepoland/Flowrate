@@ -129,12 +129,27 @@ def test_task_density_with_task_without_reps():
 TASK_FOR_TESTING_TASK_LOAD = TrainingTaskCreate(description="text", task_reps=15, task_break=20, segments=[SEGMENT])
 
 def test_task_load():
-    assert task_load(TASK_FOR_TESTING_TASK_LOAD, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(3755, abs=1)
+    assert task_load(TASK_FOR_TESTING_TASK_LOAD, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(4108, abs=1)
 
 TASK_FOR_TESTING_TASK_LOAD_WITH_LONGER_BREAK = TrainingTaskCreate(description="text", task_reps=15, task_break=60, segments=[SEGMENT])
 
 def test_task_load_with_longer_break():
-    assert task_load(TASK_FOR_TESTING_TASK_LOAD_WITH_LONGER_BREAK, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(1813, abs=1)
+    assert task_load(TASK_FOR_TESTING_TASK_LOAD_WITH_LONGER_BREAK, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(2165, abs=1)
+
+SEGMENT_WITH_100_HARD = TaskSegmentsCreate(position=1, description="text", distance=100, average_time=63)
+
+TASK_WITH_100_HARD = TrainingTaskCreate(description="text", task_reps=1, task_break=0, segments=[SEGMENT_WITH_100_HARD])
+
+SEGMENT_WITH_100_UNDER_CRITICAL_SPEED = TaskSegmentsCreate(position=1, description="text", distance=100, average_time=79)
+
+TASK_WITH_100_UNDER_CRITICAL_SPEED = TrainingTaskCreate(description="text", task_reps=1, task_break=0, segments=[SEGMENT_WITH_100_UNDER_CRITICAL_SPEED])
+
+def test_single_max_effort_costs_much_more_than_easy_rep():
+    task_load_a = task_load(TASK_WITH_100_HARD, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS)
+
+    task_load_b = task_load(TASK_WITH_100_UNDER_CRITICAL_SPEED, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS)
+
+    assert task_load_a >= 2 * task_load_b
 
 SEGMENT_FOR_TESTING_TASK_LOAD_20_TIMES_100_M = TaskSegmentsCreate(position=1, description="text", distance=100, average_time=85)
 
@@ -146,7 +161,7 @@ def test_task_load_with_task_20_times_100_m():
 TASK_FOR_TESTING_TASK_LOAD_WITH_1_REP = TrainingTaskCreate(description="text", task_reps=1, task_break=20, segments=[SEGMENT])
 
 def test_task_load_with_1_rep():
-    assert task_load(TASK_FOR_TESTING_TASK_LOAD_WITH_1_REP, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(94.9, abs=1)
+    assert task_load(TASK_FOR_TESTING_TASK_LOAD_WITH_1_REP, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(118.4, abs=1)
 
 def test_task_load_with_segment_without_times():
     assert task_load(TASK_WITH_SEGMENT_WITHOUT_TIMES, get_critical_speed(PERSONAL_BESTS), PERSONAL_BESTS) == pytest.approx(0)
@@ -154,7 +169,7 @@ def test_task_load_with_segment_without_times():
 TRAINING = TrainingCreate(date=date(2026, 10, 23), time=90, distance=2000, RPE=8, tasks=[TASK_FOR_TESTING_TASK_LOAD, TASK_FOR_TESTING_TASK_LOAD_20_TIMES_100_M])
 
 def test_training_load():
-    assert training_load(TRAINING, PERSONAL_BESTS) == pytest.approx(4970, abs=1)
+    assert training_load(TRAINING, PERSONAL_BESTS) == pytest.approx(5323, abs=1)
     
 
 
