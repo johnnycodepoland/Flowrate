@@ -1,3 +1,4 @@
+# JEDNORAZOWY: uruchomiony 12.11.2026, ponowne uruchomienie = duplikaty.
 import httpx
 import sqlite3
 import json
@@ -68,6 +69,24 @@ for training in trainings:
     training["tasks"] = tasks_by_training_id.get(training["id"], [])
     trainings_with_tasks.append(training)
 
-conn.close()
-
 print(len(trainings_with_tasks))
+
+answear = input(f"Wysłać {len(trainings_with_tasks)} treningów na konto {email}? (t/n)")
+
+if answear != "t":
+    exit()
+
+for training in trainings_with_tasks:
+    response = httpx.post(f"{SERVER_URL}/trainings", json=training, headers={"Authorization": f"Bearer {access_token}"})
+    if response.status_code != 200:
+        print(training["date"], response.status_code, response.text)
+    else:
+        print(training["date"], response.status_code)
+
+pbs = conn.execute("SELECT distance, time FROM personal_bests WHERE user_id = ?", (LOCAL_USER_ID,)).fetchall()
+
+for pb in pbs:
+    response = httpx.put(f"{SERVER_URL}/personal-bests", json={"distance": pb["distance"], "time": pb["time"]}, headers={"Authorization": f"Bearer {access_token}"})
+    print(pb["distance"], response.status_code)
+
+conn.close()
