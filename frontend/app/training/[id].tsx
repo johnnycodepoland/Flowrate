@@ -55,18 +55,6 @@ export default function TrainingDetails() {
         Inter_400Regular,
     });
 
-    const handleOptionPress = () => {
-        Alert.alert(
-            "Trening",
-            "Co chcesz zrobić?",
-            [
-                { text: "Edytuj", onPress: () => router.push(`/edit-training/${id}`) },
-                { text: "Usuń", onPress: handleDelete, style: "destructive" },
-                { text: "Anuluj", style: "cancel" },
-            ]
-        );
-    };
-
     if (!fontLoaded) {
         return null;
     }
@@ -83,6 +71,29 @@ export default function TrainingDetails() {
         })
             .then(() => router.back())
             .catch(() => showError("Brak połączenia z serwerem"));
+    };
+
+    const confirmDelete = () => {
+        Alert.alert(
+            "Usuwanie treningu",
+            "Czy na pewno chcesz usunąć ten trening?",
+            [
+                { text: "Usuń", onPress: handleDelete, style: "destructive" },
+                { text: "Anuluj", style: "cancel" },
+            ]
+        );
+    };
+
+    const handleOptionPress = () => {
+        Alert.alert(
+            "Trening",
+            "Co chcesz zrobić?",
+            [
+                { text: "Edytuj", onPress: () => router.push(`/edit-training/${id}`) },
+                { text: "Usuń", onPress: confirmDelete, style: "destructive" },
+                { text: "Anuluj", style: "cancel" },
+            ]
+        );
     };
 
     return (
