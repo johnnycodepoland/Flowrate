@@ -78,7 +78,18 @@ export default function AddTraining() {
         setTimes(times.filter((t, index) => index !== indexToRemove));
     };
 
+    const handleCloseTaskModal = () => {
+        setTaskDescription("");
+        setTaskReps("");
+        setTaskBreak("");
+        setCurrentSegments([]);
+        setTaskModalVisible(false);
+    }
+
     const handleAddTask = () => {
+        const reps = taskReps.trim() === "" ? 1 : Number(taskReps)
+        const breakSeconds = taskBreak.trim() === "" ? 0 : Number(taskBreak)
+
         if (currentSegments.length === 0) {
             Alert.alert(
                 "Trening",
@@ -95,20 +106,20 @@ export default function AddTraining() {
             return;
         }
 
-        if (!(Number(taskReps) > 0)) {
+        if (!(Number(reps) > 0)) {
             showError("Podaj ilość powtórzeń zadania")
             return;
         }
 
-        if (taskBreak.trim() === "" || !(Number(taskBreak) >= 0)) {
-            showError("Podaj przerwę (0, jeśli bez przerwy)")
+        if (!(Number(breakSeconds) >= 0)) {
+            showError("Przerwa nie może być ujemna")
             return;
         }
 
         const newTask = {
             description: taskDescription,
-            task_reps: Number(taskReps),
-            task_break: Number(taskBreak),
+            task_reps: Number(reps),
+            task_break: Number(breakSeconds),
             segments: currentSegments,
         };
         const updatedTasks = [...tasks, newTask];
@@ -180,16 +191,6 @@ export default function AddTraining() {
         if (loading) return;
 
         let allTasks = tasks;
-
-        if (taskDescription.trim() !== "" && currentSegments.length > 0) {
-            const lastTask = {
-                description: taskDescription,
-                task_reps: Number(taskReps),
-                task_break: Number(taskBreak),
-                segments: currentSegments
-            };
-            allTasks = [...tasks, lastTask]
-        }
 
         const totalDistance = allTasks.reduce((sum, task) => sum + getRepDistance(task) * task.task_reps, 0);
         const totalTime = allTasks.reduce((sum, task) => sum + (getRepTime(task) + task.task_break) * task.task_reps, 0);
@@ -364,7 +365,7 @@ export default function AddTraining() {
                         >
                             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                                 <View style={styles.modalContent}>
-                                    <Pressable onPress={() => setTaskModalVisible(false)} style={{ padding: 20, alignSelf: "flex-end" }}>
+                                    <Pressable onPress={() => handleCloseTaskModal} style={{ padding: 20, alignSelf: "flex-end" }}>
                                         <Ionicons name="close" size={28} color="#1A1A1A" />
                                     </Pressable>
                                     <Text style={styles.label}>Opis zadania</Text>
@@ -378,7 +379,7 @@ export default function AddTraining() {
                                     <Text style={styles.label}>Liczba powtórzeń</Text>
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="np. 8"
+                                        placeholder="domyślnie 1"
                                         value={taskReps}
                                         onChangeText={setTaskReps}
                                         keyboardType="number-pad"
@@ -387,7 +388,7 @@ export default function AddTraining() {
                                     <Text style={styles.label}>Przerwa (s)</Text>
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="np. 20"
+                                        placeholder="domyślnie 0"
                                         value={taskBreak}
                                         onChangeText={setTaskBreak}
                                         keyboardType="number-pad"
