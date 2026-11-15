@@ -7,13 +7,13 @@ import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-googl
 import { Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Swipeable, ScrollView } from "react-native-gesture-handler";
-import { parseDecimal, showError, hasAnyTime } from "../utils";
+import { parseDecimal, showError, hasAnyTime, RPE_LABELS } from "../utils";
 import { apiFetch } from "../api";
 
 export default function AddTraining() {
     const router = useRouter();
     const [step, setStep] = useState(1);
-    const [rpe, setRpe] = useState(5);
+    const [rpe, setRpe] = useState(3);
     const [date, setDate] = useState(new Date());
     const formattedDate = date.toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" });
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -295,7 +295,7 @@ export default function AddTraining() {
                             keyboardType="number-pad"
                         />
                         <Text style={styles.hint}>Zostaw puste, żeby policzyć z segmentów.</Text>
-                        <Text style={styles.label}>RPE sesji: {rpe}</Text>
+                        <Text style={styles.label}>RPE sesji: {rpe} – {RPE_LABELS[rpe]}</Text>
                         <Slider
                             style={{ width: "100%", height: 40 }}
                             minimumValue={1}
@@ -306,6 +306,7 @@ export default function AddTraining() {
                             minimumTrackTintColor="#6366F1"
                             maximumTrackTintColor="#F5F5F7"
                         />
+                        <Text style={styles.hint}>Oceń cały trening, najlepiej ~30 min po nim</Text>
                         <Text style={styles.label}>Data treningu</Text>
                         <Pressable style={styles.dateBox} onPress={() => setShowDatePicker(true)}>
                             <Text style={styles.dateText}>{formattedDate}</Text>
