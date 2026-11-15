@@ -48,6 +48,7 @@ export default function PersonalBests() {
 
     const handleLogout = async () => {
         await deleteToken();
+        if (router.canDismiss()) router.dismissAll();
         router.replace("/login")
     };
 
