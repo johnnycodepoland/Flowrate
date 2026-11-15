@@ -57,3 +57,16 @@ export const formatTime = (seconds) => {
 
     return finalTime
 };
+
+export const RPE_LABELS = {
+    1: "bardzo, bardzo lekko",
+    2: "lekko",
+    3: "umiarkowanie",
+    4: "dość ciężko",
+    5: "ciężko",
+    6: "ciężko+",
+    7: "bardzo ciężko",
+    8: "bardzo ciężko+",
+    9: "prawie maksymalnie",
+    10: "maksymalnie"
+};

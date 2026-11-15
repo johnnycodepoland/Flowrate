@@ -7,7 +7,7 @@ import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-googl
 import { Inter_700Bold, Inter_400Regular } from "@expo-google-fonts/inter";
 import { Swipeable, ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { parseDecimal, hasAnyTime, showError } from "../../utils";
+import { parseDecimal, hasAnyTime, showError, RPE_LABELS } from "../../utils";
 import { apiFetch } from "../../api";
 
 export default function AddTraining() {
@@ -280,7 +280,7 @@ export default function AddTraining() {
                             keyboardType="numeric"
                         />
                         <Text style={styles.hint}>Wyczyść, żeby policzyć z segmentów.</Text>
-                        <Text style={styles.label}>RPE sesji: {rpe}</Text>
+                        <Text style={styles.label}>RPE sesji: {rpe} – {RPE_LABELS[rpe]}</Text>
                         <Slider
                             style={{ width: "100%", height: 40 }}
                             minimumValue={1}
@@ -291,6 +291,7 @@ export default function AddTraining() {
                             minimumTrackTintColor="#6366F1"
                             maximumTrackTintColor="#F5F5F7"
                         />
+                        <Text style={styles.hint}>Oceń cały trening, najlepiej ~30 min po nim</Text>
                         <Text style={styles.label}>Data treningu</Text>
                         <Pressable style={styles.dateBox} onPress={() => setShowDatePicker(true)}>
                             <Text style={styles.dateText}>{formattedDate}</Text>
