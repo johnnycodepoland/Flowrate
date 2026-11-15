@@ -46,6 +46,7 @@ export default function Login() {
 
             const data = await res.json()
             await saveToken(data.access_token)
+            if (router.canDismiss()) router.dismissAll();
             router.replace("/")
         }
         catch {

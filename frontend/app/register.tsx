@@ -62,12 +62,14 @@ export default function Register() {
 
             if (!res2.ok) {
                 showError("Konto utworzone, zaloguj się")
+                if (router.canDismiss()) router.dismissAll();
                 router.replace("/login")
                 return;
             }
 
             const data = await res2.json()
             await saveToken(data.access_token)
+            if (router.canDismiss()) router.dismissAll();
             router.replace("/")
         }
         catch {

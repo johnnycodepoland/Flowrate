@@ -14,6 +14,7 @@ export const apiFetch = async (path, options = {}) => {
 
     if (res.status === 401) {
         await deleteToken();
+        if (router.canDismiss()) router.dismissAll();
         router.replace("/login")
     }
     return res;
