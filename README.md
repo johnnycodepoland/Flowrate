@@ -4,6 +4,14 @@ A training log for competitive swimmers that turns your sets into a single numbe
 
 You log a session the way it was swum (tasks, repeats, rest, split times, RPE), and Flowrate estimates the training load of every set relative to **your own** speed profile. The home screen shows a load ring that rises with each session and fades over the following days.
 
+<table align="center">
+  <tr>
+    <td align="center"><img src="docs/screenshots/home.png" width="250"><br><sub>Load ring</sub></td>
+    <td align="center"><img src="docs/screenshots/add-training.png" width="250"><br><sub>Logging a session</sub></td>
+    <td align="center"><img src="docs/screenshots/training.png" width="250"><br><sub>Session details</sub></td>
+  </tr>
+</table>
+
 Built solo, from idea to TestFlight, in about three months. The app UI is in Polish.
 
 > **Status:** beta on iOS via TestFlight. Public App Store release planned.
