@@ -1,5 +1,21 @@
+# Python
 __pycache__/
 *.pyc
+.venv*/
+.pytest_cache/
+
+# Local databases (dev data, archives, backups)
 *.db*
-.venv
+
+# Secrets and keys
+.env
+.env*.local
+*.p8
+*.pem
+
+# Node
+node_modules/
+
+# Editors and OS
 .idea/
+.DS_Store
