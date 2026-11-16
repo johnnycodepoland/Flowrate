@@ -18,6 +18,17 @@ EXTERNAL_LOAD_MAXIMUM = 25000
 
 INTERNAL_LOAD_MAXIMUM = 5000
 
+def get_training_loads(trainings_with_tasks, personal_bests):
+    loads = []
+
+    for training_dict in trainings_with_tasks:
+        training_obj = Training(**training_dict)
+        external_load = training_load(training_obj, personal_bests)
+        internal_load = session_rpe(training_obj)
+        loads.append((training_obj.date, external_load, internal_laod))
+
+    return loads
+
 def get_pb_speed(distance, personal_bests):
     distances = sorted(personal_bests)
 
