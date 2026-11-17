@@ -25,9 +25,19 @@ def get_training_loads(trainings_with_tasks, personal_bests):
         training_obj = Training(**training_dict)
         external_load = training_load(training_obj, personal_bests)
         internal_load = session_rpe(training_obj)
-        loads.append((training_obj.date, external_load, internal_laod))
+        loads.append((training_obj.date, external_load, internal_load))
 
     return loads
+
+def decayed_sum(dated_loads, as_of):
+    total = 0
+
+    for dated_load in dated_loads:
+        if dated_load[0] > as_of:
+            continue
+        days_ago = (as_of - dated_load[0]).days
+        total += dated_load[1] * calculate_decay_weight(days_ago)
+    return total
 
 def get_pb_speed(distance, personal_bests):
     distances = sorted(personal_bests)
@@ -182,37 +192,18 @@ def calculate_decay_weight(days_ago):
 
     return decay_weight
 
-# Ta funkcja podsumuje nam ważone obciążenie wszystkich treningów
-def calculate_fatigue_sum(trainings_with_tasks, personal_bests):
-    fatigue_sum = 0
-
-    for training_dict in trainings_with_tasks:
-        training_obj = Training(**training_dict)
-        load = training_load(training_obj, personal_bests)
-        days_ago = (datetime.date.today() - training_obj.date).days
-        decay_weight = calculate_decay_weight(days_ago)
-        training_fatigue = load * decay_weight
-        fatigue_sum += training_fatigue
-
-    return fatigue_sum
-
-def calculate_rpe_sum(trainings_with_tasks):
-    rpe_sum = 0
-
-    for training_dict in trainings_with_tasks:
-        training_obj = Training(**training_dict)
-        load = session_rpe(training_obj)
-        days_ago = (datetime.date.today() - training_obj.date).days
-        decay_weight = calculate_decay_weight(days_ago)
-        training_fatigue = load * decay_weight
-        rpe_sum += training_fatigue
-
-    return rpe_sum
-
 def calculate_percentage_fatigue(trainings_with_tasks, personal_bests):
-    fatigue_sum = calculate_fatigue_sum(trainings_with_tasks, personal_bests)
+    loads = get_training_loads(trainings_with_tasks, personal_bests)
 
-    rpe_sum = calculate_rpe_sum(trainings_with_tasks)
+    external = [(load[0], load[1]) for load in loads]
+
+    interal = [(load[0], load[2]) for load in loads]
+
+    today = datetime.date.today()
+    
+    fatigue_sum = decayed_sum(external, today)
+
+    rpe_sum = decayed_sum(interal, today)
 
     # Korzystamy z wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb, aby uniknąć 100 procentowego obciążenia
     external_percentage_fatigue = min(100, (fatigue_sum / EXTERNAL_LOAD_MAXIMUM) * 100)
