@@ -1,5 +1,5 @@
 import pytest
-from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density, task_load, training_load
+from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density, task_load, training_load, load_denominator, decayed_sum
 from backend.models.training import TaskSegmentsCreate, TrainingTaskCreate, TrainingCreate
 from datetime import date
 
@@ -170,16 +170,9 @@ TRAINING = TrainingCreate(date=date(2026, 10, 23), time=90, distance=2000, RPE=8
 
 def test_training_load():
     assert training_load(TRAINING, PERSONAL_BESTS) == pytest.approx(5323, abs=1)
-    
 
+def test_load_denominator_without_history_returns_constant():
+    assert load_denominator([], date(2026, 11, 18), 25000) == 25000
 
-
-
-
-
-
-
-
-
-
-                        
+def test_decayed_sum_skips_future_trainings():
+    assert decayed_sum([(date(2026, 11, 20), 1000)], date(2026, 11, 18)) == 0
