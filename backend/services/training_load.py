@@ -18,6 +18,14 @@ EXTERNAL_LOAD_MAXIMUM = 25000
 
 INTERNAL_LOAD_MAXIMUM = 5000
 
+PEAK_WINDOW_DAYS = 42
+
+PEAK_TOP_DAYS = 5
+
+BLEND_DAYS = 28
+
+FLOOR_RATIO = 0.2
+
 def get_training_loads(trainings_with_tasks, personal_bests):
     loads = []
 
@@ -38,6 +46,34 @@ def decayed_sum(dated_loads, as_of):
         days_ago = (as_of - dated_load[0]).days
         total += dated_load[1] * calculate_decay_weight(days_ago)
     return total
+
+def robust_peak(dated_loads, today):
+    results = []
+
+    for i in range(PEAK_WINDOW_DAYS):
+        day = today - datetime.timedelta(days=i)
+
+        results.append(decayed_sum(dated_loads, day))
+
+    results = sorted(results, reverse=True)[:PEAK_TOP_DAYS]
+
+    return sum(results) / len(results)
+
+def load_denominator(dated_loads, today, constant):
+    if not dated_loads:
+        return constant
+
+    oldest_day = min(date for date, load in dated_loads)
+
+    days_of_history = max((today - oldest_day).days, 0)
+
+    w = min(1, days_of_history / BLEND_DAYS)
+
+    peak = robust_peak(dated_loads, today)
+
+    denom = w * peak + (1 - w) * constant
+
+    return max(denom, FLOOR_RATIO * constant)
 
 def get_pb_speed(distance, personal_bests):
     distances = sorted(personal_bests)
@@ -197,18 +233,22 @@ def calculate_percentage_fatigue(trainings_with_tasks, personal_bests):
 
     external = [(load[0], load[1]) for load in loads]
 
-    interal = [(load[0], load[2]) for load in loads]
+    internal = [(load[0], load[2]) for load in loads]
 
     today = datetime.date.today()
     
     fatigue_sum = decayed_sum(external, today)
 
-    rpe_sum = decayed_sum(interal, today)
+    rpe_sum = decayed_sum(internal, today)
+
+    ext_denominator = load_denominator(external, today, EXTERNAL_LOAD_MAXIMUM)
+
+    int_denominator = load_denominator(internal, today, INTERNAL_LOAD_MAXIMUM)
 
     # Korzystamy z wbudowanej w pythona funkcji min, która wybierze nam mniejszą z dwóch liczb, aby uniknąć 100 procentowego obciążenia
-    external_percentage_fatigue = min(100, (fatigue_sum / EXTERNAL_LOAD_MAXIMUM) * 100)
+    external_percentage_fatigue = min(100, (fatigue_sum / ext_denominator) * 100)
 
-    internal_percentage_fatigue = min(100, (rpe_sum / INTERNAL_LOAD_MAXIMUM) * 100)
+    internal_percentage_fatigue = min(100, (rpe_sum / int_denominator) * 100)
 
     average_percentage_fatigue = (external_percentage_fatigue + internal_percentage_fatigue) / 2
 
