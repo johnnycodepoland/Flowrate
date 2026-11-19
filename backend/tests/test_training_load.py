@@ -1,5 +1,5 @@
 import pytest
-from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density, task_load, training_load, load_denominator, decayed_sum
+from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density, task_load, training_load, load_denominator, decayed_sum, robust_peak
 from backend.models.training import TaskSegmentsCreate, TrainingTaskCreate, TrainingCreate
 from datetime import date
 
@@ -176,3 +176,14 @@ def test_load_denominator_without_history_returns_constant():
 
 def test_decayed_sum_skips_future_trainings():
     assert decayed_sum([(date(2026, 11, 20), 1000)], date(2026, 11, 18)) == 0
+
+TODAY = date(2026, 11, 19)
+
+def test_load_denominator_with_low_peak():
+    assert load_denominator([(date(2026, 10, 19), 100)], TODAY, 25000) == 5000
+
+def test_load_denominator_with_high_peak():
+    assert load_denominator([(date(2026, 10, 19), 30000)], TODAY, 25000) == pytest.approx(robust_peak([(date(2026, 10, 19), 30000)], TODAY))
+
+def test_load_denominator_14_days_of_history():
+    assert load_denominator([(date(2026, 11, 5), 30000)], TODAY, 25000) == pytest.approx(0.5 * robust_peak([(date(2026, 11, 5), 30000)], TODAY) + 0.5 * 25000)
