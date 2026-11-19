@@ -19,7 +19,7 @@ Built solo, from idea to TestFlight, in about three months. The app UI is in Pol
 ## Features
 
 - **Detailed logging** – tasks (e.g. `8×100`) made of segments (e.g. `50 fast + 50 easy`), with an average time or every repeat's time, and segments without timing for kick, drills or other strokes.
-- **Load ring** – a single percentage combining external load (from your times) and internal load (session-RPE), with 7-day decay.
+- **Load ring** – a single percentage combining external load (from your times) and internal load (session-RPE), with 7-day decay, scaled to your own recent training.
 - **Personal bests** – 50 / 100 / 200 / 400 m freestyle; the model is built on them.
 - **Accounts** – email + password, each swimmer sees only their own data.
 - **Weather** at the pool, from the phone's location.
@@ -44,7 +44,17 @@ time × reps × I³ × (1 + 1.6·X² + 15·d⁵·X·(reps − 1)/reps)
 - the `X²` term makes a single all-out effort expensive,
 - the density term punishes repeating fast swimming with short rest, and only when swimming above threshold.
 
-Session-RPE (`RPE × minutes`) is computed separately, so untimed work (kick, fins, drills) still counts. The ring is the average of both, each normalised and decayed with `e^(−days / 7)`.
+Session-RPE (`RPE × minutes`) is computed separately, so untimed work (kick, fins, drills) still counts. Both parts decay with `e^(−days / 7)`.
+
+### Scaling the ring
+
+100% is not a fixed number: it's your own recent hard period.
+
+- **Peak** – for each of the last 42 days the app computes your decayed load on that day and takes the mean of the 5 highest. One exceptional day (a meet, a double session) doesn't set the scale on its own.
+- **New users** – with little history the peak isn't reliable yet, so for the first 28 days it's blended with a default value: `w = days / 28`, `scale = w × peak + (1 − w) × default`.
+- **Floor** – the scale never drops below 20% of the default, so someone who swims rarely doesn't hit 100% after one easy session.
+
+External and internal load are scaled separately, and the ring is their average.
 
 The model came from several iterations tested on real training sessions and grounded in critical speed research, swim TSS and session-RPE. Details live in [`backend/services/training_load.py`](backend/services/training_load.py) and its tests.
 
@@ -116,11 +126,12 @@ Point `API_URL` in `frontend/config.js` at your backend.
 
 ## Roadmap
 
-- user-relative scale for the load ring (100% = your hardest recent week),
-- public TestFlight link for testers, then App Store release,
+- Android version (Google Play), then App Store release,
 - account deletion, password reset and email verification,
 - strength sessions, competitions, trend charts.
 
 ## Author
 
 Built by [@johnnycodepoland](https://github.com/johnnycodepoland), a competitive swimmer who wanted to know how hard his training really is.
+
+© 2026 johnnycodepoland. All rights reserved.
