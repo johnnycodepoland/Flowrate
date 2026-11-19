@@ -2,6 +2,7 @@ import pytest
 from backend.services.training_load import get_pb_speed, get_critical_speed, segment_intensity, get_segment_speed, segment_reserve_usage, task_density, task_load, training_load, load_denominator, decayed_sum, robust_peak
 from backend.models.training import TaskSegmentsCreate, TrainingTaskCreate, TrainingCreate
 from datetime import date
+import math
 
 PERSONAL_BESTS = {50: 26.1, 100: 58.5, 200: 128.0, 400: 280.0}
 
@@ -187,3 +188,8 @@ def test_load_denominator_with_high_peak():
 
 def test_load_denominator_14_days_of_history():
     assert load_denominator([(date(2026, 11, 5), 30000)], TODAY, 25000) == pytest.approx(0.5 * robust_peak([(date(2026, 11, 5), 30000)], TODAY) + 0.5 * 25000)
+
+def test_robust_peak_averages_top_five_days():
+    training = [(date(2026, 11, 10), 100000)]
+
+    assert robust_peak(training, TODAY) == pytest.approx(100000 * sum(math.exp(-k / 7) for k in range(5)) / 5)
