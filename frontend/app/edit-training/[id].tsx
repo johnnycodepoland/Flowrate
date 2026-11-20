@@ -207,9 +207,23 @@ export default function AddTraining() {
             return;
         }
 
+        const finalTime = manualTime.trim() !== "" ? Math.round(Number(manualTime)) : Math.round(totalTime / 60)
+
+        if (finalTime <= 0) {
+            Alert.alert(
+                "Czas",
+                "Podaj czas treningu - odcinki nie mają czasów, więc nie da się go policzyć",
+                [
+                    { text: "Ok", style: "cancel" },
+                ]
+            );
+            return;
+
+        }
+
         const newTraining = {
             date: date.toISOString().split("T")[0],
-            time: manualTime.trim() !== "" ? Math.round(Number(manualTime)) : Math.round(totalTime / 60),
+            time: finalTime,
             distance: totalDistance,
             RPE: rpe,
             tasks: allTasks,
