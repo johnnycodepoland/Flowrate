@@ -6,7 +6,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter, useFocusEffect } from "expo-router";
 import * as Location from "expo-location";
 import { API_URL } from "../config";
-import { apiFetch } from "../api";
+import { apiFetch, fetchWithTimeout } from "../api";
 import { showError } from "@/utils";
 
 export default function Index() {
@@ -64,17 +64,28 @@ export default function Index() {
 
     useEffect(() => {
         const fetchWeather = async () => {
-            const { status } = await Location.requestForegroundPermissionsAsync();
+            try {
+                const { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== "granted") return;
 
-            if (status !== "granted") {
-                return;
+                let location = await Location.getLastKnownPositionAsync();
+                if (location == null) {
+                    location = await Location.getCurrentPositionAsync();
+                }
+
+                if (location == null) return;
+
+                const res = await fetchWithTimeout(
+                    `${API_URL}/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}`
+                );
+                if (!res.ok) {
+                    throw new Error("weather failed");
+                }
+                const data = await res.json();
+                setWeather(data);
+            } catch (e) {
+                setWeather(null)
             }
-
-            const location = await Location.getCurrentPositionAsync({});
-
-            fetch(`${API_URL}/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}`)
-                .then(response => response.json())
-                .then(data => setWeather(data));
         };
 
         fetchWeather();
@@ -103,10 +114,12 @@ export default function Index() {
                 <View style={styles.dateBox}>
                     <Text style={styles.dateText}>{day}</Text>
                     <Text style={styles.monthText}>{month}</Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 8 }}>
-                        <Ionicons name={weather !== null ? weatherIconMap[weather.condition] : "sunny"} size={16} color="#1A1A1A" />
-                        <Text style={styles.weatherText}>{weather !== null ? `${Math.round(weather.temperature)}°C` : "..."}</Text>
-                    </View>
+                    {weather !== null &&
+                        <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 8 }}>
+                            <Ionicons name={weather !== null ? weatherIconMap[weather.condition] : "sunny"} size={16} color="#1A1A1A" />
+                            <Text style={styles.weatherText}>{weather !== null ? `${Math.round(weather.temperature)}°C` : "..."}</Text>
+                        </View>
+                    }
                 </View>
             </View>
             {missingPersonalBests && (
