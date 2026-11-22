@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useState, useEffect, useCallback } from "react";
+import { View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert, BackHandler } from "react-native";
+import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import { useFonts, Montserrat_700Bold, Montserrat_400Regular } from "@expo-google-fonts/montserrat";
@@ -42,13 +42,41 @@ export default function AddTraining() {
         Inter_400Regular,
     });
 
-    const handleBack = () => {
-        if (step === 1) {
-            router.back();
-        } else {
-            setStep(step - 1);
-        }
+    const exitScreen = () => {
+        router.canGoBack() ? router.back() : router.replace("/");
     };
+
+    const handleBack = () => {
+        if (step > 1) {
+            setStep(step - 1);
+            return;
+        }
+
+        if (tasks.length === 0) {
+            exitScreen()
+            return;
+        }
+
+        Alert.alert(
+            "Odrzucić trening?",
+            "Wpisane zadania nie zostaną zapisane",
+            [
+                { text: "Tak", onPress: () => exitScreen(), style: "destructive"},
+                { text: "Nie", style: "cancel" },
+            ]
+        );
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+                handleBack();
+                return true;
+            });
+
+            return () => sub.remove();
+        }, [handleBack])
+    );
 
     const getRepDistance = (task) => {
         let repDistance = 0;
