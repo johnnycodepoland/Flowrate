@@ -479,6 +479,7 @@ export default function AddTraining() {
                             visible={modalVisible}
                             animationType="slide"
                             presentationStyle="pageSheet"
+                            onRequestClose={() => setModalVisible(false)}
                         >
                             <ScrollView style={styles.modalContent} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets keyboardDismissMode="on-drag">
                                 <Pressable onPress={() => setModalVisible(false)} style={{ padding: 20, alignSelf: "flex-end" }}>
