@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { View, Text, StyleSheet, Pressable, TextInput, Keyboard, TouchableWithoutFeedback, Modal, Alert, BackHandler } from "react-native";
 import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -35,6 +35,7 @@ export default function AddTraining() {
     const [manualTime, setManualTime] = useState("")
     const [hasTime, setHasTime] = useState(true);
     const [loading, setLoading] = useState(false);
+    const initialSnapshot = useRef<string | null>(null);
     const [fontLoaded] = useFonts({
         Montserrat_700Bold,
         Montserrat_400Regular,
@@ -52,19 +53,19 @@ export default function AddTraining() {
             return;
         }
 
-        if (tasks.length === 0) {
+        if (initialSnapshot.current === JSON.stringify({date, manualTime, rpe, tasks})) {
             exitScreen()
             return;
         }
 
         Alert.alert(
-            "Odrzucić trening?",
-            "Wpisane zadania nie zostaną zapisane",
+            "Odrzucić zmiany?",
+            "Wpisane zmiany nie zostaną zapisane",
             [
                 { text: "Tak", onPress: () => exitScreen(), style: "destructive"},
                 { text: "Nie", style: "cancel" },
             ]
-        );
+        )
     };
 
     useFocusEffect(
@@ -293,6 +294,12 @@ export default function AddTraining() {
                 setRpe(data.RPE);
                 setDate(new Date(data.date));
                 setTasks(data.tasks);
+                initialSnapshot.current = JSON.stringify({
+                    date: new Date(data.date),
+                    manualTime: String(data.time),
+                    rpe: data.RPE,
+                    tasks: data.tasks
+                });
             })
             .catch(() => showError("Brak połączenia z serwerem"));
     }, []);
@@ -405,10 +412,11 @@ export default function AddTraining() {
                             visible={taskModalVisible}
                             animationType="slide"
                             presentationStyle="pageSheet"
+                            onRequestClose={() => setTaskModalVisible(false)}
                         >
                             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                                 <View style={styles.modalContent}>
-                                    <Pressable onPress={() => handleCloseTaskModal} style={{ padding: 20, alignSelf: "flex-end" }}>
+                                    <Pressable onPress={() => handleCloseTaskModal()} style={{ padding: 20, alignSelf: "flex-end" }}>
                                         <Ionicons name="close" size={28} color="#1A1A1A" />
                                     </Pressable>
                                     <Text style={styles.label}>Opis zadania</Text>
@@ -473,6 +481,7 @@ export default function AddTraining() {
                                         visible={segmentModalVisible}
                                         animationType="slide"
                                         presentationStyle="pageSheet"
+                                        onRequestClose={() => setSegmentModalVisible(false)}
                                     >
                                         <ScrollView style={styles.modalContent} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets keyboardDismissMode="on-drag">
                                             <Pressable onPress={() => setSegmentModalVisible(false)} style={{ padding: 20, alignSelf: "flex-end" }}>
