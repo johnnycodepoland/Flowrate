@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
         alignSelf: "center"
     },
     percentageCircleContainer: {
-        width: "50%",
         justifyContent: "center",
         alignItems: "center",
         marginVertical: 24
@@ -188,11 +187,15 @@ const styles = StyleSheet.create({
     percentageText: {
         color: "#1A1A1A",
         fontSize: 45,
-        fontFamily: "Montserrat_700Bold"
+        fontFamily: "Montserrat_700Bold",
+        includeFontPadding: false,
+        lineHeight: 50
     },
     topRow: {
         flexDirection: "row",
-        justifyContent: "flex-start"
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 40
     },
     dateText: {
         color: "#1A1A1A",
@@ -237,8 +240,7 @@ const styles = StyleSheet.create({
     },
     dateBox: {
         justifyContent: "center",
-        alignItems: "center",
-        width: 170
+        alignItems: "center"
     },
     activityRow: {
         flexDirection: "row",
