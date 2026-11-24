@@ -33,6 +33,11 @@ export default function Register() {
                 return;
             }
 
+            if (password.trim() === "") {
+                showError("Hasło nie może składać się z samych spacji")
+                return;
+            }
+
             if (password.length < 8) {
                 showError("Hasło musi mieć minimum 8 znaków")
                 return;
