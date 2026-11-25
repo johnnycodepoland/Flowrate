@@ -63,7 +63,8 @@ def test_segment_intensity_with_none_critical_speed():
 def test_get_segment_speed():
     assert get_segment_speed(SEGMENT) == pytest.approx(1.471, abs=0.001)
 
-SEGMENT_WITHOUT_DISTANCE = TaskSegmentsCreate(position=1, description="text", distance=0, average_time=68)
+# construct, pozwala stworzyć dane z błędami (świadomie tutaj)
+SEGMENT_WITHOUT_DISTANCE = TaskSegmentsCreate.construct(position=1, description="text", distance=0, average_time=68)
 
 def test_get_segment_speed_without_distance():
     result = get_segment_speed(SEGMENT_WITHOUT_DISTANCE)
@@ -121,7 +122,7 @@ TASK_WITH_2_SEGMENTS = TrainingTaskCreate(description="text", task_reps=4, task_
 def test_task_density_with_2_segments():
     assert task_density(TASK_WITH_2_SEGMENTS) == pytest.approx(0.834, abs=0.001)
 
-TASK_WITHOUT_REPS = TrainingTaskCreate(description="text", task_reps=0, task_break=20, segments=[SEGMENT])
+TASK_WITHOUT_REPS = TrainingTaskCreate.construct(description="text", task_reps=0, task_break=20, segments=[SEGMENT])
 
 def test_task_density_with_task_without_reps():
     result = task_density(TASK_WITHOUT_REPS)
