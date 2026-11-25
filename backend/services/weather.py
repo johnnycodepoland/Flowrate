@@ -1,4 +1,5 @@
 import httpx
+from fastapi import HTTPException
 
 weather_code_map = {
     0: "clear",
@@ -38,9 +39,15 @@ async def get_weather(lat: float, lon: float):
     # Definiujemy szerkość i wysokośc geograficzną
     params = {"latitude": lat, "longitude": lon, "current": "temperature_2m,weather_code"}
 
-    async with httpx.AsyncClient() as client:
-        # Korzystamy z funkcji await, aby poczekać z resztą kodu, aż do uzyskania odpowiedzi
-        response = await client.get(url, params=params)
+    try:
+        async with httpx.AsyncClient() as client:
+            # Korzystamy z funkcji await, aby poczekać z resztą kodu, aż do uzyskania odpowiedzi
+            response = await client.get(url, params=params)
+    except httpx.RequestError:
+        raise HTTPException(status_code=502, detail="Weather service unavailable")
+
+    if not response.is_success:
+        raise HTTPException(status_code=502, detail="Weather service unavailable")
 
     data = response.json()
 

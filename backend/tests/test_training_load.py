@@ -63,7 +63,8 @@ def test_segment_intensity_with_none_critical_speed():
 def test_get_segment_speed():
     assert get_segment_speed(SEGMENT) == pytest.approx(1.471, abs=0.001)
 
-SEGMENT_WITHOUT_DISTANCE = TaskSegmentsCreate(position=1, description="text", distance=0, average_time=68)
+# construct, pozwala stworzyć dane z błędami (świadomie tutaj)
+SEGMENT_WITHOUT_DISTANCE = TaskSegmentsCreate.construct(position=1, description="text", distance=0, average_time=68)
 
 def test_get_segment_speed_without_distance():
     result = get_segment_speed(SEGMENT_WITHOUT_DISTANCE)
@@ -121,7 +122,7 @@ TASK_WITH_2_SEGMENTS = TrainingTaskCreate(description="text", task_reps=4, task_
 def test_task_density_with_2_segments():
     assert task_density(TASK_WITH_2_SEGMENTS) == pytest.approx(0.834, abs=0.001)
 
-TASK_WITHOUT_REPS = TrainingTaskCreate(description="text", task_reps=0, task_break=20, segments=[SEGMENT])
+TASK_WITHOUT_REPS = TrainingTaskCreate.construct(description="text", task_reps=0, task_break=20, segments=[SEGMENT])
 
 def test_task_density_with_task_without_reps():
     result = task_density(TASK_WITHOUT_REPS)
@@ -193,3 +194,18 @@ def test_robust_peak_averages_top_five_days():
     training = [(date(2026, 11, 10), 100000)]
 
     assert robust_peak(training, TODAY) == pytest.approx(100000 * sum(math.exp(-k / 7) for k in range(5)) / 5)
+
+PERSONAL_BESTS_WITH_TIME_0 = {50: 0, 100: 58.5, 200: 128.0, 400: 280.0}
+
+def test_get_pb_speed_with_zero_pb():
+    assert get_pb_speed(50, PERSONAL_BESTS_WITH_TIME_0) is None
+
+PERSONAL_BESTS_WITH_100_SAME_AS_CS = {50: 26.1, 100: 76, 200: 128.0, 400: 280.0}
+
+def test_segment_reserve_usage_if_pb_is_same_as_cs():
+    assert segment_reserve_usage(SEGMENT, get_critical_speed(PERSONAL_BESTS_WITH_100_SAME_AS_CS), PERSONAL_BESTS_WITH_100_SAME_AS_CS) == 0
+
+PERSONAL_BESTS_WITH_100_SLOWER_THAN_CS = {50: 26.1, 100: 80, 200: 128.0, 400: 280.0}
+
+def test_segment_reserve_usage_if_pb_is_slower_than_cs():
+    assert segment_reserve_usage(SEGMENT, get_critical_speed(PERSONAL_BESTS_WITH_100_SLOWER_THAN_CS), PERSONAL_BESTS_WITH_100_SLOWER_THAN_CS) == 0
