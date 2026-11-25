@@ -78,6 +78,10 @@ def load_denominator(dated_loads, today, constant):
 def get_pb_speed(distance, personal_bests):
     distances = sorted(personal_bests)
 
+    for time in personal_bests.values():
+        if time <= 0:
+            return None
+
     if distance in personal_bests:
         return distance / personal_bests[distance]
 
@@ -145,6 +149,12 @@ def segment_reserve_usage(segment, critical_speed, personal_bests):
         return None
 
     pb_speed = get_pb_speed(segment.distance, personal_bests)
+
+    if pb_speed is None:
+        return 0
+
+    if pb_speed - critical_speed <= 0:
+        return 0
 
     reserve_usage = max(0, min((segment_speed - critical_speed) / (pb_speed - critical_speed), 1))
 

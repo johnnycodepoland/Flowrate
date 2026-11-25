@@ -194,3 +194,18 @@ def test_robust_peak_averages_top_five_days():
     training = [(date(2026, 11, 10), 100000)]
 
     assert robust_peak(training, TODAY) == pytest.approx(100000 * sum(math.exp(-k / 7) for k in range(5)) / 5)
+
+PERSONAL_BESTS_WITH_TIME_0 = {50: 0, 100: 58.5, 200: 128.0, 400: 280.0}
+
+def test_get_pb_speed_with_zero_pb():
+    assert get_pb_speed(50, PERSONAL_BESTS_WITH_TIME_0) is None
+
+PERSONAL_BESTS_WITH_100_SAME_AS_CS = {50: 26.1, 100: 76, 200: 128.0, 400: 280.0}
+
+def test_segment_reserve_usage_if_pb_is_same_as_cs():
+    assert segment_reserve_usage(SEGMENT, get_critical_speed(PERSONAL_BESTS_WITH_100_SAME_AS_CS), PERSONAL_BESTS_WITH_100_SAME_AS_CS) == 0
+
+PERSONAL_BESTS_WITH_100_SLOWER_THAN_CS = {50: 26.1, 100: 80, 200: 128.0, 400: 280.0}
+
+def test_segment_reserve_usage_if_pb_is_slower_than_cs():
+    assert segment_reserve_usage(SEGMENT, get_critical_speed(PERSONAL_BESTS_WITH_100_SLOWER_THAN_CS), PERSONAL_BESTS_WITH_100_SLOWER_THAN_CS) == 0
