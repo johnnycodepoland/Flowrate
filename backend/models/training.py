@@ -1,5 +1,5 @@
 from datetime import date
-from pydantic import BaseModel, Field, confloat
+from pydantic import BaseModel, Field, confloat, root_validator
 from typing import Optional
 
 class TaskSegmentsCreate(BaseModel):
@@ -9,6 +9,17 @@ class TaskSegmentsCreate(BaseModel):
     target_time: Optional[float] = Field(None, gt=0)
     average_time: Optional[float] = Field(None, gt=0)
     times: Optional[list[confloat(gt=0)]] = None
+    rest_after: Optional[float] = Field(None, ge=0)
+    send_off: Optional[float] = Field(None, gt=0)
+
+    @root_validator
+    def check_rest_after_and_send_off(cls, values):
+        rest_after = values.get("rest_after")
+        send_off = values.get("send_off")
+
+        if rest_after is not None and send_off is not None:
+            raise ValueError("Provide either rest_after or send_off, not both")
+        return values
 
 class TrainingSegments(TaskSegmentsCreate):
     id: int
