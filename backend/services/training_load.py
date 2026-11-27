@@ -26,6 +26,19 @@ BLEND_DAYS = 28
 
 FLOOR_RATIO = 0.2
 
+def segment_rest(segment, reps):
+    if segment.rest_after is not None:
+        return segment.rest_after * reps
+    elif segment.send_off is not None:
+        if segment.times:
+            total = 0
+            for t in segment.times:
+                total += max(0, segment.send_off - t)
+            return total
+        elif segment.average_time is not None:
+            return max(0, segment.send_off - segment.average_time) * reps
+    return 0
+
 def get_training_loads(trainings_with_tasks, personal_bests):
     loads = []
 
@@ -176,10 +189,20 @@ def task_density(task):
 
     if rep_time == 0:
         return None
+    
+    # Po segmencie z najwyszą pozycją nie liczymm przerwy
+    last_segment = max(task.segments, key=lambda s: s.position)
+
+    segment_breaks = 0
+
+    for segment in task.segments:
+        if segment is last_segment:
+            continue
+        segment_breaks += segment_rest(segment, task.task_reps)
 
     work = rep_time * task.task_reps
 
-    breaks = task.task_break * (task.task_reps - 1)
+    breaks = segment_breaks + task.task_break * (task.task_reps - 1)
 
     return work / (work + breaks)
 
